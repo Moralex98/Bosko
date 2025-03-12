@@ -4,22 +4,25 @@
 //
 //  Created by Freddy Morales on 08/03/25.
 //
-
 import SwiftUI
 
-struct ContentLevelView: View {
+struct ContentView: View {
     private let xOffsets: [CGFloat] = [0, -40, -60, -40, 0]
     private let icons: [String] = [
-        "star.fill",
-        "dumbbell.fill",
-        "forward.fill",
-        "star.fill",
-        "bubbles.and.sparkles.fill"
-        ]
+        "1.circle.fill",
+        "2.circle.fill",
+        "3.circle.fill",
+        "4.circle.fill",
+        "5.circle.fill"
+    ]
+    
+    @State var score: Int = 0 // Se añade un valor inicial
+    @State private var showGameView = false
+    
     var body: some View {
         ZStack {
             Color.black.opacity(0.5).ignoresSafeArea()
-            VStack(spacing: 20, content: {
+            VStack(spacing: 20) {
                 Text("Section 1: Rookie")
                     .font(.title3)
                     .bold()
@@ -29,7 +32,7 @@ struct ContentLevelView: View {
                 
                 ForEach(0..<xOffsets.count, id: \.self) { index in
                     if index == xOffsets.count / 2 {
-                        HStack{
+                        HStack {
                             ellipseButton(image: icons[index])
                             
                             Image("natural")
@@ -46,37 +49,43 @@ struct ContentLevelView: View {
                 rectangleButton()
                 
                 Spacer()
-            })
+            }
+            ScoreView(score: $score) // Se pasa correctamente como binding
+                .offset(x: UIScreen.main.bounds.width / 2 - 100, y: -UIScreen.main.bounds.height / 2 + 50)
+        }
+        .fullScreenCover(isPresented: $showGameView) {
+            GameView(isPresented: $showGameView, score: $score)
         }
     }
+    
     @ViewBuilder
     private func ellipseButton(image: String) -> some View {
         Button(action: {}, label: {
             Image(systemName: image)
                 .resizable()
-                .frame(width: 30, height: 30)
+                .frame(width: 85, height: 85)
                 .aspectRatio(contentMode: .fit)
                 .foregroundStyle(.white)
         })
-        .buttonStyle(DepthButtonStyle(fooregroundColor: .green, backgroundColor: .blue))
-        .frame(width: 80, height: 70)
+        .buttonStyle(DepthButtonStyle(fooregroundColor: .green, backgroundColor: .blue)) // Corregido
+        .frame(width: 150, height: 140)
         .padding()
     }
+    
     @ViewBuilder
     private func rectangleButton() -> some View {
-        
         Button {
-            
-        } label : {
-            Text("Continue")
+            showGameView = true
+        } label: {
+            Text("Bonus")
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.black)
         }
-        .buttonStyle(DepthButtonStyle(fooregroundColor: .red, backgroundColor: .red, cornerRadius: 20))
+        .buttonStyle(DepthButtonStyle(fooregroundColor: .red, backgroundColor: .red, cornerRadius: 20)) // Corregido
         .frame(width: 250, height: 50)
     }
 }
 
 #Preview {
-    ContentLevelView()
+    ContentView(score: 0)
 }
