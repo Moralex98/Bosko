@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct GameView: View {
+    @EnvironmentObject var gameData: GameData
     @Binding var isPresented: Bool
-    @Binding var score: Int
     @State private var balloons: [Balloon] = []
-    //@State private var score: Int = 0
     @State private var timeRemaining = 30
     @State private var gameActive = true
     @State private var speedMultiplier = 1.0
     @State private var showAlert = false
-    
+    @State private var showPopup = true
+    @State private var save = false
+
     private let screenWidth = UIScreen.main.bounds.width
     private let screenHeight = UIScreen.main.bounds.height
     private let balloonSpawnInterval = 1.0
@@ -27,7 +28,7 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Color.cyan.ignoresSafeArea()
             
             ForEach(balloons) { balloon in
                 BalloonView(balloon: balloon)
@@ -44,10 +45,12 @@ struct GameView: View {
                 
                 Spacer()
             }
+            if showPopup {
+                PopUpView(popup: $showPopup, save: $save)
+            }
             
-            // Puntuación en la esquina superior derecha
-            ScoreView(score: $score)
-                .offset(x: screenWidth / 2 - 100, y: -screenHeight / 2 + 50)
+            ScoreView()
+                .offset(x: screenWidth / 2 - 150, y: -screenHeight / 2 + 80)
             
             if !gameActive {
                 VStack {
@@ -55,7 +58,7 @@ struct GameView: View {
                         .font(.largeTitle)
                         .foregroundColor(.white)
                         .padding()
-                    Text("Puntuación final: \(score)")
+                    Text("Puntuación final: \(gameData.score)")
                         .font(.title)
                         .foregroundColor(.orange)
                     Button(action: {
@@ -68,7 +71,6 @@ struct GameView: View {
                     .alert(isPresented: $showAlert) {
                         Alert(
                             title: Text("¿Quieres seguir jugando?"),
-                            message: Text("Tu puntuación se mantendrá."),
                             primaryButton: .default(Text("Sí")) {
                                 resetGame() // Ahora reinicia correctamente el juego
                             },
@@ -82,14 +84,16 @@ struct GameView: View {
                 .cornerRadius(20)
             }
         }
-        .onAppear {
-            startGameTimer()
-            startSpawningBalloons()
+        .onChange(of: save) {
+            if save {
+                startGameTimer()
+                startSpawningBalloons()
+            }
         }
     }
     
     func popBallon() {
-        score += 10
+        gameData.score += 10
     }
     
     func startGameTimer() {
@@ -153,9 +157,9 @@ struct GameView: View {
                 balloons[index].isPopped = true
                 
                 if balloons[index].isBad {
-                    score -= 5
+                    gameData.score -= 5
                 } else {
-                    score += 5
+                    gameData.score += 5
                 }
                 
                 speedMultiplier += 0.1
@@ -178,6 +182,5 @@ struct GameView: View {
 
 #Preview {
     @State var isPresented: Bool = true
-    @State var sampleScore = 0
-    return GameView(isPresented: $isPresented, score: $sampleScore)
+    GameView(isPresented: $isPresented).environmentObject(GameData())
 }

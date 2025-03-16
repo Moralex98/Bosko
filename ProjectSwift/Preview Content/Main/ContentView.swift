@@ -16,8 +16,9 @@ struct ContentView: View {
         "5.circle.fill"
     ]
     
-    @State var score: Int = 0 // Se añade un valor inicial
+    @State var score: Int = 0
     @State private var showGameView = false
+    @StateObject var gameData = GameData()
     
     var body: some View {
         ZStack {
@@ -50,12 +51,13 @@ struct ContentView: View {
                 
                 Spacer()
             }
-            ScoreView(score: $score) // Se pasa correctamente como binding
-                .offset(x: UIScreen.main.bounds.width / 2 - 100, y: -UIScreen.main.bounds.height / 2 + 50)
+            ScoreView()
+                .offset(x: UIScreen.main.bounds.width / 2 - 150, y: -UIScreen.main.bounds.height / 2 + 80)
         }
         .fullScreenCover(isPresented: $showGameView) {
-            GameView(isPresented: $showGameView, score: $score)
+            GameView(isPresented: $showGameView).environmentObject(gameData)
         }
+        .environmentObject(gameData)
     }
     
     @ViewBuilder
