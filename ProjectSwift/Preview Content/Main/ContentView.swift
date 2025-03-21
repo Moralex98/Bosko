@@ -4,6 +4,7 @@
 //
 //  Created by Freddy Morales on 08/03/25.
 //
+
 import SwiftUI
 
 struct ContentView: View {
@@ -19,18 +20,25 @@ struct ContentView: View {
     @State var score: Int = 0
     @State private var showGameView = false
     @StateObject var gameData = GameData()
-    
+    @State private var floating = false // Estado para animación
+
     var body: some View {
         ZStack {
-            Color.black.opacity(0.5).ignoresSafeArea()
+            // Imagen de fondo
+            Image("vistageneral")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                
             VStack(spacing: 20) {
                 Text("Section 1: Rookie")
                     .font(.title3)
                     .bold()
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.gray)
-                
+                    .background(Color.gray.opacity(0.8))
+
+                // Botones animados
                 ForEach(0..<xOffsets.count, id: \.self) { index in
                     if index == xOffsets.count / 2 {
                         HStack {
@@ -47,12 +55,16 @@ struct ContentView: View {
                             .offset(x: xOffsets[index])
                     }
                 }
+                
                 rectangleButton()
                 
                 Spacer()
             }
             ScoreView()
                 .offset(x: UIScreen.main.bounds.width / 2 - 150, y: -UIScreen.main.bounds.height / 2 + 80)
+        }
+        .onAppear {
+            floating.toggle() // Activa la animación cuando la vista aparece
         }
         .fullScreenCover(isPresented: $showGameView) {
             GameView(isPresented: $showGameView).environmentObject(gameData)
@@ -69,9 +81,11 @@ struct ContentView: View {
                 .aspectRatio(contentMode: .fit)
                 .foregroundStyle(.white)
         })
-        .buttonStyle(DepthButtonStyle(fooregroundColor: .green, backgroundColor: .blue)) // Corregido
+        .buttonStyle(DepthButtonStyle(fooregroundColor: Color(red: 0.2, green: 0.5, blue: 0.2), backgroundColor: Color(red: 0.6, green: 0.4, blue: 0.2))) // Verde oscuro con borde marrón claro
         .frame(width: 150, height: 140)
         .padding()
+        .offset(y: floating ? -5 : 5) // Animación de flotación
+        .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating) // Hace que se repita siempre
     }
     
     @ViewBuilder
@@ -83,7 +97,7 @@ struct ContentView: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.black)
         }
-        .buttonStyle(DepthButtonStyle(fooregroundColor: .red, backgroundColor: .red, cornerRadius: 20)) // Corregido
+        .buttonStyle(DepthButtonStyle(fooregroundColor: .red, backgroundColor: .red, cornerRadius: 20))
         .frame(width: 250, height: 50)
     }
 }
