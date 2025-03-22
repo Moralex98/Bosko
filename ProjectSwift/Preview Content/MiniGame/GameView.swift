@@ -28,7 +28,10 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
-            Color.cyan.ignoresSafeArea()
+            Image("game1") 
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
             
             ForEach(balloons) { balloon in
                 BalloonView(balloon: balloon)
@@ -40,50 +43,28 @@ struct GameView: View {
             VStack {
                 Text("Tiempo: \(timeRemaining)")
                     .font(.custom("Bebas Neue", size: 25))
-                    .foregroundColor(.yellow)
+                    .foregroundColor(.blue)
                     .padding(.top, 50)
                 
                 Spacer()
             }
+
             if showPopup {
-                PopUpView(popup: $showPopup, save: $save)
+                PopUpView(
+                    popup: $showPopup,
+                    save: $save,
+                    instructions: "¡Atrapa toda la basura que puedas, pero cuidado no todo es lo que parece!"
+                )
             }
             
             ScoreView()
                 .offset(x: screenWidth / 2 - 150, y: -screenHeight / 2 + 80)
             
             if !gameActive {
-                VStack {
-                    Text("¡Juego terminado!")
-                        .font(.largeTitle)
-                        .foregroundColor(.white)
-                        .padding()
-                    Text("Puntuación final: \(gameData.score)")
-                        .font(.title)
-                        .foregroundColor(.orange)
-                    Button(action: {
-                        showAlert = true
-                    }) {
-                        Text("Continuar")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                    }
-                    .alert(isPresented: $showAlert) {
-                        Alert(
-                            title: Text("¿Quieres seguir jugando?"),
-                            primaryButton: .default(Text("Sí")) {
-                                resetGame() // Ahora reinicia correctamente el juego
-                            },
-                            secondaryButton: .destructive(Text("No")) {
-                                isPresented = false
-                            }
-                        )
-                    }
-                }
-                .background(Color.black.opacity(0.8))
-                .cornerRadius(20)
+                endMiniGamePopup()
             }
         }
+
         .onChange(of: save) {
             if save {
                 startGameTimer()
@@ -167,16 +148,49 @@ struct GameView: View {
         }
     }
     
-    //Reiniciar el juego correctamente
     private func resetGame() {
         timeRemaining = 30
         gameActive = true
         balloons.removeAll()
         speedMultiplier = 1.0
         
-        // Volver a iniciar el temporizador y los globos
         startGameTimer()
         startSpawningBalloons()
+    }
+    
+    private func endMiniGamePopup() -> some View {
+        VStack(spacing: 16) {
+            Text("¡Juego terminado!")
+                .font(.title)
+                .fontWeight(.bold)
+
+            Text("Puntuación final: \(gameData.score)")
+                .font(.title2)
+                .foregroundColor(.orange)
+
+            HStack(spacing: 20) {
+                Button("Reintentar") {
+                    resetGame()
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+
+                Button("Salir") {
+                    isPresented = false
+                }
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 10)
+        .frame(maxWidth: 300)
     }
 }
 

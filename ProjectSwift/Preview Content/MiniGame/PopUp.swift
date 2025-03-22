@@ -10,6 +10,7 @@ import SwiftUI
 struct PopUpView: View {
     @Binding var popup: Bool
     @Binding var save: Bool
+    var instructions: String
     
     var UISW: CGFloat = UIScreen.main.bounds.width
     var UISH: CGFloat = UIScreen.main.bounds.height
@@ -27,9 +28,15 @@ struct PopUpView: View {
                         .frame(width: 130)
                         .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
                     
-                    Text("¿Listo Para comenzar?")
+                    Text("¿Listo para comenzar?")
                         .font(.largeTitle.bold())
                         .padding(.top, 50)
+                    
+                    Text(instructions)
+                        .multilineTextAlignment(.center)
+                        .font(.custom("Futura-Medium", size: 30))
+                        .padding(.horizontal)
+                        .foregroundColor(.red)
                     
                     Button{
                         withAnimation(.easeInOut(duration: 0.3)) {
@@ -54,10 +61,14 @@ struct PopUpView: View {
 struct PopUpView_Previews: PreviewProvider {
     @State static var popup = true
     @State static var save = true
-    
-    static var previews: some View{
-        PopUpView(popup: $popup, save: $save)
-            
+
+    static var previews: some View {
+        PopUpView(
+            popup: $popup,
+            save: $save,
+            instructions: "Arrastra los objetos reciclables a su contenedor correcto en menos de 30 segundos"
+        )
     }
 }
+
 

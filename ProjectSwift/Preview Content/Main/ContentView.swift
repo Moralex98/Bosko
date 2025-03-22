@@ -20,17 +20,18 @@ struct ContentView: View {
     @State var score: Int = 0
     @State private var showGameView = false
     @StateObject var gameData = GameData()
-    @State private var floating = false // Estado para animación
+    @State private var floating = false
+    @State private var levelStars: [Int] = Array(repeating: 0, count: 5)
+    @State private var showLevelOne = false
 
     var body: some View {
         ZStack {
-            // Imagen de fondo
             Image("vistageneral")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
                 
-            VStack(spacing: 20) {
+            VStack() {
                 Text("Section 1: Rookie")
                     .font(.title3)
                     .bold()
@@ -38,22 +39,42 @@ struct ContentView: View {
                     .padding()
                     .background(Color.gray.opacity(0.8))
 
-                // Botones animados
                 ForEach(0..<xOffsets.count, id: \.self) { index in
-                    if index == xOffsets.count / 2 {
-                        HStack {
-                            ellipseButton(image: icons[index])
-                            
-                            Image("natural")
+                    VStack() {
+                        Button {
+                            if index == 0 {
+                                showLevelOne = true
+                            }
+                        } label: {
+                            Image(systemName: icons[index])
                                 .resizable()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 85, height: 85)
                                 .aspectRatio(contentMode: .fit)
-                                .padding()
+                                .foregroundStyle(.white)
                         }
-                    } else {
-                        ellipseButton(image: icons[index])
-                            .offset(x: xOffsets[index])
+                        .buttonStyle(
+                            DepthButtonStyle(
+                                fooregroundColor: Color(red: 0.2, green: 0.5, blue: 0.2),
+                                backgroundColor: Color(red: 0.6, green: 0.4, blue: 0.2)
+                            )
+                        )
+                        .frame(width: 150, height: 140)
+                        .padding()
+                        .offset(y: floating ? -5 : 5)
+                        .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
+
+                        HStack(spacing: 4) {
+                            ForEach(0..<3) { starIndex in
+                                Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
+                                    .resizable()
+                                    .frame(width: 15, height: 15)
+                                    .foregroundColor(starIndex < levelStars[index] ? .red : .black)
+                                    .offset(y: floating ? -5 : 5)
+                                    .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
+                            }
+                        }
                     }
+                    .offset(x: xOffsets[index])
                 }
                 
                 rectangleButton()
@@ -64,8 +85,18 @@ struct ContentView: View {
                 .offset(x: UIScreen.main.bounds.width / 2 - 150, y: -UIScreen.main.bounds.height / 2 + 80)
         }
         .onAppear {
-            floating.toggle() // Activa la animación cuando la vista aparece
+            floating.toggle()
         }
+        .fullScreenCover(isPresented: $showLevelOne) {
+            LevelOneView(
+                onFinish: { estrellas in
+                    levelStars[0] = estrellas
+                },
+                isPresented: $showLevelOne
+            )
+            .environmentObject(gameData)
+        }
+
         .fullScreenCover(isPresented: $showGameView) {
             GameView(isPresented: $showGameView).environmentObject(gameData)
         }
@@ -73,19 +104,30 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func ellipseButton(image: String) -> some View {
-        Button(action: {}, label: {
+    private func ellipseButton(image: String, index: Int) -> some View {
+        Button(action: {
+            if index == 0 {
+                showLevelOne = true
+            } else {
+                
+            }
+        }, label: {
             Image(systemName: image)
                 .resizable()
                 .frame(width: 85, height: 85)
                 .aspectRatio(contentMode: .fit)
                 .foregroundStyle(.white)
         })
-        .buttonStyle(DepthButtonStyle(fooregroundColor: Color(red: 0.2, green: 0.5, blue: 0.2), backgroundColor: Color(red: 0.6, green: 0.4, blue: 0.2))) // Verde oscuro con borde marrón claro
+        .buttonStyle(
+            DepthButtonStyle(
+                fooregroundColor: Color(red: 0.2, green: 0.5, blue: 0.2),
+                backgroundColor: Color(red: 0.6, green: 0.4, blue: 0.2))
+        )
         .frame(width: 150, height: 140)
         .padding()
-        .offset(y: floating ? -5 : 5) // Animación de flotación
-        .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating) // Hace que se repita siempre
+        .offset(y: floating ? -5 : 5)
+        .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
+        
     }
     
     @ViewBuilder
