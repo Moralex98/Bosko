@@ -31,25 +31,25 @@ struct LevelOneView: View {
             Image("plastic")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: UISW * 0.12)
-                    .position(x: UISW * 0.85, y: UISH * 0.57)
+                    .frame(width: UISW * 0.25)
+                    .position(x: UISW * 0.82, y: UISH * 0.57)
 
             Image("glass")
                 .resizable()
                 .scaledToFit()
-                .frame(width: UISW * 0.10)
-                .position(x: UISW * 0.15, y: UISH * 0.611)
-            
+                .frame(width: UISW * 0.25)
+                .position(x: UISW * 0.20, y: UISH * 0.623)
+            //0.611
             Image("organic")
                 .resizable()
                 .scaledToFit()
-                .frame(width: UISW * 0.10)
+                .frame(width: UISW * 0.30)
                 .position(x: UISW * 0.52, y: UISH * 0.90)
             
             Image("paper")
                 .resizable()
                 .scaledToFit()
-                .frame(width: UISW * 0.12)
+                .frame(width: UISW * 0.25)
                 .position(x: UISW * 0.73, y: UISH * 0.75)
             
             //plastic
@@ -57,83 +57,83 @@ struct LevelOneView: View {
                 imageName: "bottle",
                 start: CGSize(width: -UISW * 0.45, height: UISH * 0.35),
                 targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                size: UISW * 0.05,
+                size: UISW * 0.10,
                 onDrop: { markItemDropped(at: 0) }
             )
             DraggableItemView(
                 imageName: "bag",
                 start: CGSize(width: UISW * 0.45, height: UISH * 0.35),
                 targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                size: UISW * 0.05,
+                size: UISW * 0.10,
                 onDrop: { markItemDropped(at: 1) }
             )
             DraggableItemView(
                 imageName: "glasslid",
                 start: CGSize(width: -UISW * 0.36, height: -UISH * 0.2),
                 targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                size: UISW * 0.05,
+                size: UISW * 0.12,
                 onDrop: { markItemDropped(at: 2) }
             )
             DraggableItemView(
                 imageName: "glass1",
                 start: CGSize(width: UISW * 0.44, height: -UISH * 0.23),
                 targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                size: UISW * 0.05,
+                size: UISW * 0.15,
                 onDrop: { markItemDropped(at: 3) }
             ) // glass
             DraggableItemView(
                 imageName: "wine",
                 start: CGSize(width: -UISW * 0.30, height: UISH * 0.23),
                 targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
-                size: UISW * 0.05,
+                size: UISW * 0.10,
                 onDrop: { markItemDropped(at: 4) }
             )
             DraggableItemView(
                 imageName: "pitcher", start: CGSize(width: UISW * 0.40, height: UISH * 0.15),
                 targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
-                size: UISW * 0.05,
+                size: UISW * 0.10,
                 onDrop: { markItemDropped(at: 5) }
             )
             DraggableItemView(
                 imageName: "cup",
-                start: CGSize(width: UISW * 0.10, height: UISH * 0.027),
+                start: CGSize(width: UISW * 0.15, height: UISH * 0.001),
                 targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
-                size: UISW * 0.05,
+                size: UISW * 0.15,
                 onDrop: { markItemDropped(at: 6) }
             ) //organic
             DraggableItemView(
                 imageName: "carrot",
                 start: CGSize(width: -UISW * 0.13, height: UISH * 0.17),
                 targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                size: UISW * 0.05,
+                size: UISW * 0.10,
                 onDrop: { markItemDropped(at: 7) }
             )
             DraggableItemView(
                 imageName: "banana",
                 start: CGSize(width: UISW * 0.10, height: UISH * 0.2),
                 targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                size: UISW * 0.05,
+                size: UISW * 0.07,
                 onDrop: { markItemDropped(at: 8) }
             )
             DraggableItemView(
                 imageName: "apple",
                 start: CGSize(width: -UISW * 0.36, height: UISH * 0.027),
                 targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                size: UISW * 0.05,
+                size: UISW * 0.07,
                 onDrop: { markItemDropped(at: 9) }
             )
             DraggableItemView(
                 imageName: "fish",
                 start: CGSize(width: -UISW * 0.01, height: -UISH * 0.3),
                 targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                size: UISW * 0.15,
+                size: UISW * 0.17,
                 onDrop: { markItemDropped(at: 10) }
             ) //paper
             DraggableItemView(
                 imageName: "periodico",
                 start: CGSize(width: -UISW * 0.36, height: -UISH * 0.4),
                 targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                size: UISW * 0.07,
+                size: UISW * 0.08,
                 onDrop: { markItemDropped(at: 11) }
             )
             DraggableItemView(
@@ -147,7 +147,7 @@ struct LevelOneView: View {
                 imageName: "rollos",
                 start: CGSize(width: UISW * 0.26, height: UISH * 0.4),
                 targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                size: UISW * 0.08,
+                size: UISW * 0.10,
                 onDrop: { markItemDropped(at: 13) }
             )
             
