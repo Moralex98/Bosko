@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    var UISW: CGFloat = UIScreen.main.bounds.width
+    var UISH: CGFloat = UIScreen.main.bounds.height
     private let xOffsets: [CGFloat] = [0, -40, -60, -40, 0]
     private let icons: [String] = [
         "1.circle.fill",
@@ -23,6 +25,9 @@ struct ContentView: View {
     @State private var floating = false
     @State private var levelStars: [Int] = Array(repeating: 0, count: 5)
     @State private var showLevelOne = false
+    @State private var showNoLivesPopup = false
+    @State private var showHeartShop = false
+    @Binding var isPressented: Bool
 
     var body: some View {
         ZStack {
@@ -30,20 +35,38 @@ struct ContentView: View {
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
-                
+            
             VStack() {
-                Text("Section 1: Rookie")
-                    .font(.title3)
-                    .bold()
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.8))
-
+                ZStack{
+                    Text("Section 1: Rookie")
+                        .font(.title3)
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.8))
+                    
+                    Button(action: {
+                        isPressented = false
+                    }) {
+                        Image(systemName: "arrowshape.turn.up.left")
+                            .font(.title2.bold())
+                            .frame(width: 30, height: 10)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(15)
+                    }
+                    .position(x: UISW * 0.06, y: UISH * 0.02)
+                }
                 ForEach(0..<xOffsets.count, id: \.self) { index in
                     VStack() {
                         Button {
                             if index == 0 {
-                                showLevelOne = true
+                                if gameData.lives > 0 {
+                                    showLevelOne = true
+                                } else {
+                                    showNoLivesPopup = true
+                                }
                             }
                         } label: {
                             Image(systemName: icons[index])
@@ -62,7 +85,7 @@ struct ContentView: View {
                         .padding()
                         .offset(y: floating ? -5 : 5)
                         .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
-
+                        
                         HStack(spacing: 4) {
                             ForEach(0..<3) { starIndex in
                                 Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
@@ -82,7 +105,50 @@ struct ContentView: View {
                 Spacer()
             }
             ScoreView()
-                .offset(x: UIScreen.main.bounds.width / 2 - 150, y: -UIScreen.main.bounds.height / 2 + 80)
+                .environmentObject(gameData)
+                .offset(x: 260, y: -550)
+
+            if showHeartShop {
+                HeartShopView(isPresented: $showHeartShop)
+                    .environmentObject(gameData)
+                    .position(x: UISW / 2, y: UISH / 2)
+            }
+            
+            if showNoLivesPopup {
+                VStack(spacing: 16) {
+                    Text("¡Sin vidas!")
+                        .font(.title)
+                        .fontWeight(.bold)
+
+                    Text("No tienes vidas suficientes. ¿Deseas comprar vidas?")
+                        .multilineTextAlignment(.center)
+
+                    HStack(spacing: 20) {
+                        Button("Cancelar") {
+                            showNoLivesPopup = false
+                        }
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+
+                        Button("Ir a tienda") {
+                            showNoLivesPopup = false
+                            showHeartShop = true
+                        }
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(radius: 10)
+                .frame(maxWidth: 300)
+            }
+            
         }
         .onAppear {
             floating.toggle()
@@ -145,5 +211,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(score: 0)
+    ContentView(score: 0, isPressented: .constant(true))
 }

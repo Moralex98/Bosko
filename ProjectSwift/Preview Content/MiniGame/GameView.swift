@@ -17,6 +17,7 @@ struct GameView: View {
     @State private var showAlert = false
     @State private var showPopup = true
     @State private var save = false
+    @State private var balloonQueue: [String] = []
 
     private let screenWidth = UIScreen.main.bounds.width
     private let screenHeight = UIScreen.main.bounds.height
@@ -100,13 +101,21 @@ struct GameView: View {
         }
     }
     
+    private func getNextImage(isBad: Bool) -> String {
+        if balloonQueue.isEmpty {
+            let source = isBad ? badBalloons : goodBalloons
+            balloonQueue = source.shuffled()
+        }
+        return balloonQueue.removeFirst()
+    }
+    
     private func spawnBalloon() {
         let randomXPosition = CGFloat.random(in: 50...(screenWidth - 50))
         let isBad = Bool.random()
-        let imageName = isBad ? badBalloons.randomElement()! : goodBalloons.randomElement()!
-        let randomSpeed = Double.random(in: 3...6) / speedMultiplier
+        let imageName = getNextImage(isBad: isBad)
+        let randomSpeed = Double.random(in: 1...3) / speedMultiplier
         let randomRotation = Double.random(in: -360...360)
-        let randomSize = CGFloat.random(in: 50...100)
+        let randomSize = CGFloat.random(in: 100...300)
         
         let initialPosition = CGPoint(x: randomXPosition, y: screenHeight + 50)
         
@@ -120,11 +129,17 @@ struct GameView: View {
         )
         
         balloons.append(balloon)
-        
+
         withAnimation(.linear(duration: randomSpeed)) {
-            moveBalloonToTop(balloon.id)
+            if let index = balloons.firstIndex(where: { $0.id == balloon.id }) {
+                    balloons[index].position = CGPoint(x: balloons[index].position.x, y: -150)
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + randomSpeed) {
+            balloons.removeAll { $0.id == balloon.id }
         }
     }
+    
     
     private func moveBalloonToTop(_ balloonID: UUID) {
         if let index = balloons.firstIndex(where: { $0.id == balloonID }) {
@@ -147,7 +162,7 @@ struct GameView: View {
             }
         }
     }
-    
+     
     private func resetGame() {
         timeRemaining = 30
         gameActive = true
