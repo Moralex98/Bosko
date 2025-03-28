@@ -8,27 +8,67 @@
 import Foundation
 import AVKit
 
-var player: AVAudioPlayer!
+var backgroundPlayer: AVAudioPlayer!
+var effectPlayer: AVAudioPlayer!
 
 enum SoundOption: String{
-    case chilldrum
+    case Basura
+    case IntroCumbia
+    case Introduc
 }
 
-func playSound(sound: SoundOption){
-    let url = Bundle.main.url(forResource: sound.rawValue,  withExtension: ".mp3")
-            
-    guard url != nil else{
+func playBackgroundSound(sound: SoundOption, fadeOutPrevious: Bool = true) {
+    guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
+        print("No se encontró el sonido de fondo: \(sound.rawValue)")
         return
     }
-    do{
-        player = try AVAudioPlayer(contentsOf: url!)
-        player?.play()
-    }catch{
-        print("error")
+
+    // Si ya está sonando ese sonido, no hagas nada
+    if backgroundPlayer != nil, backgroundPlayer.isPlaying,
+       backgroundPlayer.url == url {
+        return
+    }
+
+    if fadeOutPrevious, backgroundPlayer != nil {
+        backgroundPlayer.setVolume(0, fadeDuration: 1.0)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            startNewBackgroundSound(url: url)
+        }
+    } else {
+        startNewBackgroundSound(url: url)
     }
 }
 
-func stopSound() {
-    player?.stop()
+private func startNewBackgroundSound(url: URL) {
+    do {
+        backgroundPlayer = try AVAudioPlayer(contentsOf: url)
+        backgroundPlayer.volume = 1.0
+        backgroundPlayer.numberOfLoops = -1
+        backgroundPlayer.play()
+    } catch {
+        print("Error al reproducir música de fondo: \(error.localizedDescription)")
+    }
 }
+
+
+func stopBackgroundSound() {
+    backgroundPlayer?.stop()
+}
+
+func playEffectSound(sound: SoundOption) {
+    if !areEffectsEnabled { return } // ← se respeta configuración
+
+    guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else {
+        print("No se encontró el efecto: \(sound.rawValue)")
+        return
+    }
+    
+    do {
+        effectPlayer = try AVAudioPlayer(contentsOf: url)
+        effectPlayer?.play()
+    } catch {
+        print("Error al reproducir efecto: \(error.localizedDescription)")
+    }
+}
+
 

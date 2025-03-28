@@ -61,19 +61,6 @@ struct ModesView: View {
                                 }
                             }
                             .padding()
-
-                            Button(action: {
-                                showPrincipal = false
-                            }) {
-                                Image(systemName: "arrowshape.turn.up.left")
-                                    .font(.title2.bold())
-                                    .frame(width: 30, height: 10)
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.blue)
-                                    .cornerRadius(15)
-                            }
-                            .position(x: UISW * 0.06, y: UISH * 0.03)
                         }
                     }
 

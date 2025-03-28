@@ -46,7 +46,6 @@ struct HeartShopView: View {
             }
             .padding()
 
-            // Botón X - siempre arriba
             VStack {
                 HStack {
                     Spacer()
@@ -64,7 +63,6 @@ struct HeartShopView: View {
             .frame(width: 300, height: 230)
             .zIndex(2)
 
-            // Popup de confirmación
             if showConfirmPopup {
                 confirmPopup()
                     .zIndex(3)

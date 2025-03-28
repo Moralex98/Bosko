@@ -20,6 +20,12 @@ struct LevelOneView: View {
     @State private var timer: Timer?
     @State private var itemStates: [Bool] = Array(repeating: true, count: 14)
     @State private var estrellasObtenidas: Int = 0
+    @State private var showExitConfirmation = false
+    @State private var pauseTime = false
+    @State private var showExitPopup = false
+    @State private var showConfiguration = false
+    @State private var rotateIcon = false
+    @Binding var contentReturn: Bool
     @Binding var isPresented: Bool
 
     var body: some View {
@@ -39,8 +45,8 @@ struct LevelOneView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: UISW * 0.25)
-                    .position(x: UISW * 0.20, y: UISH * 0.623)
-                //0.611
+                    .position(x: UISW * 0.20, y: UISH * 0.60)
+                
                 Image("organic")
                     .resizable()
                     .scaledToFit()
@@ -152,13 +158,49 @@ struct LevelOneView: View {
                     onDrop: { markItemDropped(at: 13) }
                 )
                 
-                
-                VStack {
+                HStack {
+                    Button(action: {
+                        pauseTime = true
+                        timer?.invalidate()
+                        showExitPopup = true
+                    }) {
+                        Image(systemName: "arrowshape.turn.up.left")
+                            .font(.title2.bold())
+                            .frame(width: 30, height: 10)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(15)
+                    }
+
+                    Spacer()
+
                     Text("Tiempo: \(timeRemaining)")
                         .font(.custom("Bebas Neue", size: 25))
                         .foregroundColor(.blue)
-                        .padding(.top, 40)
+
                     Spacer()
+                    
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 35))
+                        .rotationEffect(.degrees(rotateIcon ? 360 : 0))
+                        .onTapGesture {
+                            withAnimation {
+                                showConfiguration.toggle()
+                                rotateIcon.toggle()
+                            }
+                        }
+                    
+                }
+                .padding()
+                .padding(.top, 05)
+                .background(Color.gray.opacity(0.4))
+                .position(x: UISW * 0.50, y: UISH * 0.02)
+                
+                if showConfiguration {
+                    ConfigurationView(showConfig: $showConfiguration)
+                        .environmentObject(gameData)
+                        .offset(x: 250, y: -535)
                 }
                 
                 if showEndPopup {
@@ -168,6 +210,8 @@ struct LevelOneView: View {
             .allowsHitTesting(!showStartPopup)
             
             if showStartPopup {
+                Color.black
+                    .opacity(0.7).ignoresSafeArea()
                 PopUpView(
                     popup: $showStartPopup,
                     save: $save,
@@ -176,14 +220,67 @@ struct LevelOneView: View {
                 .zIndex(1)
                 .allowsHitTesting(true)
             }
-                
+            
+            if showExitPopup {
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 16) {
+                    Text("¿Deseas salir del juego?")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+
+                    Text("Si sales, no se contará ninguna estrella.")
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+
+                    HStack(spacing: 20) {
+                        Button("Salir") {
+                            isPresented = false
+                        }
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+
+                        Button("Continuar") {
+                            pauseTime = false
+                            startTimer()
+                            showExitPopup = false
+                        }
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(radius: 10)
+                .frame(maxWidth: 300)
+                .zIndex(2)
+            }
         }
         .onChange(of: save) {
             if save {
                 startTimer()
             }
         }
+        .alert("¿Deseas salir del juego?", isPresented: $showExitConfirmation) {
+            Button("Sí, regresar", role: .destructive) {
+                isPresented = false 
+            }
+            Button("Continuar", role: .cancel) {
+                pauseTime = false
+                startTimer()
+            }
+        } message: {
+            Text("Si sales, no se contará ninguna estrella.")
+        }
     }
+        
     
     private func endGamePopup() -> some View {
            VStack(spacing: 16) {
@@ -247,8 +344,11 @@ struct LevelOneView: View {
 
     private func startTimer() {
         timer?.invalidate()
-        timeRemaining = 60
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { t in
+            if pauseTime {
+                return // Pausado, no hace nada
+            }
+
             if timeRemaining > 0 {
                 timeRemaining -= 1
             } else {
@@ -298,9 +398,10 @@ struct LevelOneView: View {
     
     private func markItemDropped(at index: Int) {
         itemStates[index] = false
-        print("Item \(index) marcado como completado.")
+        playEffectSound(sound: .Basura)
         checkIfAllDropped()
     }
+
 
 }
 
@@ -309,7 +410,7 @@ struct LevelOneView: View {
         onFinish: { estrellas in
             print("Estrellas en preview: \(estrellas)")
         },
-        isPresented: .constant(true)
+        contentReturn: .constant(true), isPresented: .constant(true)
     )
     .environmentObject(GameData())
 }

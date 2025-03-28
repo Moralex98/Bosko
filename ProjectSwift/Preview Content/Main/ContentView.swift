@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVKit
 
 struct ContentView: View {
     var UISW: CGFloat = UIScreen.main.bounds.width
@@ -27,6 +28,7 @@ struct ContentView: View {
     @State private var showLevelOne = false
     @State private var showNoLivesPopup = false
     @State private var showHeartShop = false
+    @State private var contentReturn = true
     @Binding var isPressented: Bool
 
     var body: some View {
@@ -36,14 +38,15 @@ struct ContentView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
             
-            VStack() {
+            VStack {
                 ZStack{
                     Text("Section 1: Rookie")
                         .font(.title3)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.gray.opacity(0.8))
+                        .background(Color.gray.opacity(0.6))
+                        //.offset(y: -10)
                     
                     Button(action: {
                         isPressented = false
@@ -151,6 +154,7 @@ struct ContentView: View {
             
         }
         .onAppear {
+            playBackgroundSound(sound: .IntroCumbia, fadeOutPrevious: true)
             floating.toggle()
         }
         .fullScreenCover(isPresented: $showLevelOne) {
@@ -158,6 +162,7 @@ struct ContentView: View {
                 onFinish: { estrellas in
                     levelStars[0] = estrellas
                 },
+                contentReturn: $contentReturn,
                 isPresented: $showLevelOne
             )
             .environmentObject(gameData)

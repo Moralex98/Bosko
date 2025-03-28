@@ -5,6 +5,13 @@
 //  Created by Freddy Morales on 12/03/25.
 //
 
+//
+//  ShootView.swift
+//  ProjectSwift
+//
+//  Created by Freddy Morales on 12/03/25.
+//
+
 import SwiftUI
 
 struct GameView: View {
@@ -18,6 +25,9 @@ struct GameView: View {
     @State private var showPopup = true
     @State private var save = false
     @State private var balloonQueue: [String] = []
+    @State private var showConfiguration = false
+    @State private var rotateIcon = false
+    @State private var showStartPopup = true
 
     private let screenWidth = UIScreen.main.bounds.width
     private let screenHeight = UIScreen.main.bounds.height
@@ -27,9 +37,12 @@ struct GameView: View {
     private let goodBalloons = ["imagen1", "imagen2", "imagen3", "imagen4", "imagen5", "imagen6"]
     private let badBalloons = ["animal1", "animal2", "animal3", "animal4"]
     
+    var UISW: CGFloat { UIScreen.main.bounds.width }
+    var UISH: CGFloat { UIScreen.main.bounds.height }
+    
     var body: some View {
         ZStack {
-            Image("game1") 
+            Image("game1")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -41,25 +54,46 @@ struct GameView: View {
                     }
             }
             
-            VStack {
+            HStack {
+                
+
+                Spacer()
+
                 Text("Tiempo: \(timeRemaining)")
                     .font(.custom("Bebas Neue", size: 25))
                     .foregroundColor(.blue)
-                    .padding(.top, 50)
-                
+
                 Spacer()
+                
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 35))
+                    .rotationEffect(.degrees(rotateIcon ? 360 : 0))
+                    .onTapGesture {
+                        withAnimation {
+                            showConfiguration.toggle()
+                            rotateIcon.toggle()
+                        }
+                    }
+                
+            }
+            .padding()
+            .padding(.top, 05)
+            .background(Color.gray.opacity(0.4))
+            .position(x: UISW * 0.50, y: UISH * 0.02)
+            
+            if showConfiguration {
+                ConfigurationView(showConfig: $showConfiguration)
+                    .environmentObject(gameData)
+                    .offset(x: 250, y: -535)
             }
 
-            if showPopup {
-                PopUpView(
-                    popup: $showPopup,
-                    save: $save,
-                    instructions: "¡Atrapa toda la basura que puedas, pero cuidado no todo es lo que parece!"
-                )
+            if showStartPopup {
+                Color.black.opacity(0.7).ignoresSafeArea()
+                startPopup()
+                    .zIndex(1)
+                    .allowsHitTesting(true)
             }
-            
-            ScoreView()
-                .offset(x: screenWidth / 2 - 150, y: -screenHeight / 2 + 80)
+
             
             if !gameActive {
                 endMiniGamePopup()
@@ -152,6 +186,8 @@ struct GameView: View {
             if !balloons[index].isPopped {
                 balloons[index].isPopped = true
                 
+                playEffectSound(sound: .Basura)
+                
                 if balloons[index].isBad {
                     gameData.score -= 5
                 } else {
@@ -207,6 +243,56 @@ struct GameView: View {
         .shadow(radius: 10)
         .frame(maxWidth: 300)
     }
+    
+    private func startPopup() -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 30)
+                .foregroundColor(.white)
+            
+            VStack(spacing: 20) {
+                Image(systemName: "checkmark.seal.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 130)
+                    .foregroundColor(.blue)
+                
+                Text("¿Listo para comenzar?")
+                    .font(.largeTitle.bold())
+                    .padding(.top, 10)
+                
+                Text("Arrastra los objetos reciclables a su contenedor correcto en menos de 60 segundos")
+                    .multilineTextAlignment(.center)
+                    .font(.custom("Futura-Medium", size: 24))
+                    .padding(.horizontal)
+                    .foregroundColor(.red)
+                
+                HStack(spacing: 20) {
+                    Button("Regresar") {
+                        isPresented = false
+                    }
+                    .padding()
+                    .background(Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(15)
+                    
+                    Button("Empezar") {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showStartPopup = false
+                            save = true
+                        }
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(15)
+                }
+            }
+            .padding()
+        }
+        .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.45)
+        .ignoresSafeArea()
+    }
+
 }
 
 #Preview {

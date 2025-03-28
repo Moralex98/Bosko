@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+var areEffectsEnabled: Bool = true
+
 struct ScoreView: View {
     @EnvironmentObject var gameData: GameData
     @State private var showConfiguration = false
@@ -14,7 +16,10 @@ struct ScoreView: View {
     @State private var isPulsingC = false
     @State private var isPulsingH = false
     @State private var rotateIcon = false
+    @State private var pulseHeart = false
+    @State private var pulseGear = false
 
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
@@ -31,7 +36,7 @@ struct ScoreView: View {
                         .foregroundColor(gameData.lives > 0 ? .red : .gray)
                         .font(.system(size: 30))
                         .scaleEffect(isPulsingH ? 1.2 : 1.0)
-                        .animation(.easeIn(duration: 1), value: rotateIcon)
+                        .scaleEffect(pulseHeart ? 1.2 : 1.0)
                         .onTapGesture {
                             withAnimation {
                                 showConfiguration = false
@@ -51,6 +56,7 @@ struct ScoreView: View {
                     .foregroundColor(.black)
                     .font(.system(size: 30))
                     .scaleEffect(isPulsingC ? 1.2 : 1.0)
+                    .scaleEffect(pulseGear ? 1.2 : 1.0)
                     .animation(.easeInOut(duration: 0.2), value: isPulsingC)
                     .rotationEffect(.degrees(rotateIcon ? 360 : 0))
                     .onTapGesture {
@@ -81,6 +87,14 @@ struct ScoreView: View {
                     .offset(y: 160)
                     .transition(.scale.combined(with: .opacity))
                     .animation(.easeInOut(duration: 0.3), value: showHeartShop)
+            }
+        }
+        .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                withAnimation(.easeInOut(duration: 0.8)) {
+                    pulseHeart.toggle()
+                    pulseGear.toggle()
+                }
             }
         }
     }
@@ -116,56 +130,54 @@ class GameData: ObservableObject {
 struct ConfigurationView: View {
     @EnvironmentObject var gameData: GameData
     @Binding var showConfig: Bool
-
+    
     @State private var isPulsing1 = false
     @State private var isPulsing2 = false
     @State private var isPressedVoice: Bool = false
     @State private var isPressedSound: Bool = false
-
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.cyan.opacity(0.4))
                 .frame(width: 150, height: 50)
-
-            VStack(spacing: 25) {
-                HStack(spacing: 25) {
-                    Image(systemName: isPressedVoice ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                        .foregroundColor(.black)
-                        .font(.title)
-                        .scaleEffect(isPulsing1 ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: isPulsing1)
-                        .onTapGesture {
-                            isPressedVoice.toggle()
-                            if isPressedVoice {
-                                stopSound()
-                            } else {
-                                playSound(sound: .chilldrum)
-                            }
-                            isPulsing1.toggle()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                isPulsing1 = false
-                            }
+            
+            HStack(spacing: 25) {
+                // Botón para el sonido de fondo
+                Image(systemName: isPressedVoice ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                    .foregroundColor(.black)
+                    .font(.title)
+                    .frame(width: 30, height: 30)
+                    .scaleEffect(isPulsing1 ? 1.2 : 1.0)
+                    .animation(.easeInOut(duration: 0.2), value: isPulsing1)
+                    .onTapGesture {
+                        isPressedVoice.toggle()
+                        if isPressedVoice {
+                            stopBackgroundSound()
+                        } else {
+                            playBackgroundSound(sound: .IntroCumbia)
                         }
-
-                    Image(systemName: isPressedSound ? "waveform.slash" : "waveform")
-                        .foregroundColor(.black)
-                        .font(.title)
-                        .scaleEffect(isPulsing2 ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: isPulsing2)
-                        .onTapGesture {
-                            isPressedSound.toggle()
-                            if isPressedSound {
-                                playSound(sound: .chilldrum)
-                            } else {
-                                stopSound()
-                            }
-                            isPulsing2.toggle()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                isPulsing2 = false
-                            }
+                        isPulsing1 = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            isPulsing1 = false
                         }
-                }
+                    }
+                
+                // Botón para efectos de sonido (clicks, drops)
+                Image(systemName: isPressedSound ? "waveform.slash" : "waveform")
+                    .foregroundColor(.black)
+                    .font(.title)
+                    .frame(width: 30, height: 30)
+                    .scaleEffect(isPulsing2 ? 1.2 : 1.0)
+                    .animation(.easeInOut(duration: 0.2), value: isPulsing2)
+                    .onTapGesture {
+                        isPressedSound.toggle()
+                        areEffectsEnabled = !isPressedSound // ← desactiva efectos si está presionado
+                        isPulsing2 = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            isPulsing2 = false
+                        }
+                    }
             }
         }
     }
