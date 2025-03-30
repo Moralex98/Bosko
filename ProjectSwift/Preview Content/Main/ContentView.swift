@@ -11,13 +11,11 @@ import AVKit
 struct ContentView: View {
     var UISW: CGFloat = UIScreen.main.bounds.width
     var UISH: CGFloat = UIScreen.main.bounds.height
-    private let xOffsets: [CGFloat] = [0, -40, -60, -40, 0]
+    private let xOffsets: [CGFloat] = [-40, -80, -40,]
     private let icons: [String] = [
         "1.circle.fill",
         "2.circle.fill",
-        "3.circle.fill",
-        "4.circle.fill",
-        "5.circle.fill"
+        "3.circle.fill"
     ]
     
     @State var score: Int = 0
@@ -26,6 +24,8 @@ struct ContentView: View {
     @State private var floating = false
     @State private var levelStars: [Int] = Array(repeating: 0, count: 5)
     @State private var showLevelOne = false
+    @State private var showLevelTwo = false
+    @State private var showLevelThree = false
     @State private var showNoLivesPopup = false
     @State private var showHeartShop = false
     @State private var contentReturn = true
@@ -46,7 +46,7 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.6))
-                        //.offset(y: -10)
+                        .offset(y: -200)
                     
                     Button(action: {
                         isPressented = false
@@ -61,16 +61,31 @@ struct ContentView: View {
                     }
                     .position(x: UISW * 0.06, y: UISH * 0.02)
                 }
-                ForEach(0..<xOffsets.count, id: \.self) { index in
-                    VStack() {
+                ForEach(0..<min(xOffsets.count, icons.count), id: \.self) { index in
+                    VStack {
                         Button {
-                            if index == 0 {
-                                if gameData.lives > 0 {
-                                    showLevelOne = true
-                                } else {
-                                    showNoLivesPopup = true
+                            switch index {
+                                case 0:
+                                    if gameData.lives > 0 {
+                                        showLevelOne = true
+                                    } else {
+                                        showNoLivesPopup = true
+                                    }
+                                case 1:
+                                    if gameData.lives > 0 {
+                                        showLevelTwo = true
+                                    } else {
+                                        showNoLivesPopup = true
+                                    }
+                                case 2:
+                                    if gameData.lives > 0 {
+                                        showLevelThree = true
+                                    } else {
+                                        showNoLivesPopup = true
+                                    }
+                                default:
+                                    break
                                 }
-                            }
                         } label: {
                             Image(systemName: icons[index])
                                 .resizable()
@@ -100,7 +115,9 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .offset(x: xOffsets[index])
+                    
+                    .offset(x: xOffsets[index], y: -300)
+                    .padding(.bottom, 10)
                 }
                 
                 rectangleButton()
@@ -164,6 +181,28 @@ struct ContentView: View {
                 },
                 contentReturn: $contentReturn,
                 isPresented: $showLevelOne
+            )
+            .environmentObject(gameData)
+        }
+        
+        .fullScreenCover(isPresented: $showLevelTwo) {
+            LevelTwoView(
+                onFinish: { estrellas in
+                    levelStars[1] = estrellas
+                },
+                contentReturn: $contentReturn,
+                isPresented: $showLevelTwo
+            )
+            .environmentObject(gameData)
+        }
+
+        .fullScreenCover(isPresented: $showLevelThree) {
+            LevelTwoView(
+                onFinish: { estrellas in
+                    levelStars[2] = estrellas
+                },
+                contentReturn: $contentReturn,
+                isPresented: $showLevelThree
             )
             .environmentObject(gameData)
         }

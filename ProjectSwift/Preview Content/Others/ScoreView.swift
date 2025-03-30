@@ -122,10 +122,6 @@ struct ScoreView: View {
     ScoreView().environmentObject(GameData())
 }
 
-class GameData: ObservableObject {
-    @Published var score: Int = 0
-    @Published var lives: Int = 5
-}
 
 struct ConfigurationView: View {
     @EnvironmentObject var gameData: GameData

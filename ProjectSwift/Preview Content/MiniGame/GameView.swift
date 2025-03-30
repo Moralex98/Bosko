@@ -84,7 +84,7 @@ struct GameView: View {
             if showConfiguration {
                 ConfigurationView(showConfig: $showConfiguration)
                     .environmentObject(gameData)
-                    .offset(x: 250, y: -535)
+                    .offset(x: 250, y: -545)
             }
 
             if showStartPopup {

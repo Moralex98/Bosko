@@ -119,7 +119,7 @@ struct LevelOneView: View {
                     imageName: "banana",
                     start: CGSize(width: UISW * 0.10, height: UISH * 0.2),
                     targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                    size: UISW * 0.07,
+                    size: UISW * 0.10,
                     onDrop: { markItemDropped(at: 8) }
                 )
                 DraggableItemView(
@@ -147,14 +147,14 @@ struct LevelOneView: View {
                     imageName: "carton",
                     start: CGSize(width: UISW * 0.42, height: -UISH * 0.4),
                     targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                    size: UISW * 0.08,
+                    size: UISW * 0.18,
                     onDrop: { markItemDropped(at: 12) }
                 )
                 DraggableItemView(
                     imageName: "rollos",
                     start: CGSize(width: UISW * 0.26, height: UISH * 0.4),
                     targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                    size: UISW * 0.10,
+                    size: UISW * 0.15,
                     onDrop: { markItemDropped(at: 13) }
                 )
                 
@@ -328,7 +328,8 @@ struct LevelOneView: View {
 
        private func resetGame() {
            timeRemaining = 60
-           itemStates = Array(repeating: true, count: 7)
+           itemStates = Array(repeating: true, count: 14)
+           itemsRemaining = 14
            showEndPopup = false
            startTimer()
        }
@@ -402,6 +403,7 @@ struct LevelOneView: View {
         checkIfAllDropped()
     }
 
+    
 
 }
 

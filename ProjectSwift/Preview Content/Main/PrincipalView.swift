@@ -13,6 +13,9 @@ struct PrincipalView: View {
     @State private var showModesView = false
     @State private var showLoadingBar = false
     @State private var loadingProgress: CGFloat = 0.0
+    
+    @Environment(\.managedObjectContext) private var context
+    @EnvironmentObject var gameData: GameData
 
     var UISW: CGFloat = UIScreen.main.bounds.width
     var UISH: CGFloat = UIScreen.main.bounds.height
@@ -57,12 +60,13 @@ struct PrincipalView: View {
             }
         }
         .onAppear {
-             //playBackgroundSound(sound: .Introduc, fadeOutPrevious: false)
+             playBackgroundSound(sound: .Introduc, fadeOutPrevious: false)
         }
         
         .ignoresSafeArea()
         .fullScreenCover(isPresented: $showModesView) {
             ModesView(showPrincipal: $showModesView)
+                .environmentObject(gameData)
         }
         
     }

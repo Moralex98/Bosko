@@ -20,7 +20,7 @@ struct ModesView: View {
     }
 
     @State private var selectedView: SelectedView = .main
-
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {

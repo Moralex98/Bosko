@@ -14,5 +14,5 @@ extension Color {
     public static var colorTree = Color(red: 0.59, green: 0.22, blue: 0.71)
     public static var colorFour = Color(red: 0.35, green: 0.35, blue: 0.84)
     public static var colorFive = Color(red: 0.17, green: 0.53, blue: 0.98)
-    
+    public static var tierraCafe = Color(red: 0.45, green: 0.32, blue: 0.20)
 }
