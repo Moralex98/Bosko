@@ -7,16 +7,16 @@
 import SwiftUI
 
 struct LevelThreeView: View {
-    @State private var characterOffset: CGSize = .zero
+    @State private var characterOffset: CGSize = CGSize(width: -365, height: -250)
     @State private var facingRight: Bool = true
     @State private var isJumping = false
     @State private var jumpHeight: CGFloat = 100
     @State private var groundY: CGFloat = 0
     @State private var obstacles: [CGRect] = []
-    @State private var pickupPoints: [CGPoint] = [
-        CGPoint(x: 100, y: -30),
-        CGPoint(x: 800, y: -30),
-        CGPoint(x: 1200, y: -30)
+    @State private var pickupItems: [PickupItem] = [
+        PickupItem(imageName: "apple", position: CGPoint(x: 100, y: -30)),
+        PickupItem(imageName: "apple", position: CGPoint(x: 300, y: -30)),
+        PickupItem(imageName: "apple", position: CGPoint(x: 600, y: -30))
     ]
     @State private var objectImages: [(image: String, position: CGPoint)] = []
     @State private var collectedCount = 0
@@ -34,6 +34,14 @@ struct LevelThreeView: View {
     @State private var showExitPopup = false
     @State private var showConfiguration = false
     @State private var rotateIcon = false
+    @State private var animarD = false
+    @State private var animarI = false
+    @State private var jumpOffset: CGFloat = 0
+    @State private var heldObject: String? = nil
+    let pickupImage = "apple"
+    let collectedImage = "banana"
+
+
     @Binding var contentReturn: Bool
     @Binding var isPresented: Bool
 
@@ -42,9 +50,6 @@ struct LevelThreeView: View {
     let screenWidth: CGFloat = UIScreen.main.bounds.width
     let screenHeight: CGFloat = UIScreen.main.bounds.height
 
-    var UISW: CGFloat { UIScreen.main.bounds.width }
-    var UISH: CGFloat { UIScreen.main.bounds.height }
-
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             Color.blue.opacity(0.1).ignoresSafeArea()
@@ -52,9 +57,7 @@ struct LevelThreeView: View {
             VStack(spacing: 0) {
                 GeometryReader { geo in
                     ZStack(alignment: .bottomLeading) {
-                        Color.green
-                            .edgesIgnoringSafeArea(.all)
-                            .opacity(0.5)
+                        Color.green.edgesIgnoringSafeArea(.all).opacity(0.5)
 
                         Rectangle()
                             .fill(Color.green)
@@ -73,44 +76,55 @@ struct LevelThreeView: View {
                                 }
                         }
 
-                        ForEach(pickupPoints, id: \.self) { point in
-                            Image("apple")
+                        ForEach(pickupItems) { item in
+                            Image(item.imageName)
                                 .resizable()
-                                .frame(width: 50, height: 50)
-                                .offset(x: point.x, y: point.y - 30)
+                                .frame(width: 60, height: 60)
+                                .offset(x: item.position.x, y: item.position.y)
                         }
 
-                        ForEach(objectImages, id: \.self.position) { obj in
+                       ForEach(objectImages, id: \.self.position) { obj in
                             Image(obj.image)
                                 .resizable()
-                                .frame(width: 50, height: 50)
-                                .offset(x: obj.position.x, y: obj.position.y)
+                                .frame(width: 40, height: 40)
+                               .offset(x: obj.position.x, y: obj.position.y - 30)
                         }
-
-                        Image(facingRight ? "derecha" : "izquierda")
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                            .offset(x: characterOffset.width, y: characterOffset.height - 50)
-                            .onAppear {
-                                groundY = geo.size.height - 50
-                            }
                     }
                     .frame(width: worldWidth, height: geo.size.height)
                     .offset(x: -(characterOffset.width - screenWidth / 2).clamped(to: 0...(worldWidth - screenWidth)))
+                    .onAppear {
+                        groundY = geo.size.height - 50
+                    }
                 }
                 .frame(height: screenHeight * 2 / 3)
 
                 CharacterView(
                     direction: facingRight ? "right" : "left",
-                    position: .zero,
+                    position: $characterOffset,
+                    objectImageName: heldObject,
+                    character: {
+                        Group {
+                            if facingRight {
+                                DerechaView(animarD: $animarD)
+                            } else {
+                                IzquierdaView(animarI: $animarI)
+                            }
+                        }
+                    },
                     onMoveLeft: { startHolding(direction: true) },
                     onMoveRight: { startHolding(direction: false) },
                     onStopMoving: { stopHolding() },
                     onJump: { jump() },
                     onPickup: { tryPickup() },
-                    showCharacter: false
+                    showCharacter: true,
+                    animarD: $animarD,
+                    animarI: $animarI,
+                    facingRight: $facingRight,
+                    jumpOffset: $jumpOffset,
+                    pickupItems: $pickupItems
                 )
                 .frame(height: screenHeight / 3)
+                .id(heldObject ?? "none")
             }
 
             Text("Objetos atrapados: \(collectedCount)/3")
@@ -154,7 +168,7 @@ struct LevelThreeView: View {
             .padding()
             .padding(.top, 05)
             .background(Color.gray.opacity(0.4))
-            .position(x: UISW * 0.50, y: UISH * 0.04)
+            .position(x: screenWidth * 0.50, y: screenHeight * 0.04)
 
             if showConfiguration {
                 ConfigurationView(showConfig: $showConfiguration)
@@ -186,25 +200,35 @@ struct LevelThreeView: View {
         isJumping = true
 
         withAnimation(.easeOut(duration: 0.3)) {
-            characterOffset.height = -jumpHeight
+            jumpOffset = -jumpHeight
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.easeIn(duration: 0.3)) {
-                characterOffset.height = 0
+                jumpOffset = 0
                 isJumping = false
             }
         }
     }
 
     func tryPickup() {
-        pickupPoints = pickupPoints.filter { point in
-            let near = abs(characterOffset.width - point.x) < 40
-            if near {
+        let characterX = characterOffset.width + screenWidth / 2
+        let characterY = groundY + characterOffset.height + jumpOffset
+
+        pickupItems.removeAll { item in
+            let itemY = groundY + item.position.y
+            let dx = abs(characterX - item.position.x)
+            let dy = abs(characterY - itemY)
+
+            let isNear = dx < 50 && dy < 50
+
+            if isNear {
                 collectedCount += 1
-                objectImages.append(("banana", CGPoint(x: point.x, y: point.y - 30)))
+                objectImages.append((collectedImage, item.position))
+                heldObject = collectedImage
             }
-            return !near
+
+            return isNear
         }
     }
 

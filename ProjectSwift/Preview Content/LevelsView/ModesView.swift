@@ -11,6 +11,7 @@ struct ModesView: View {
     var UISW: CGFloat = UIScreen.main.bounds.width
     var UISH: CGFloat = UIScreen.main.bounds.height
     @Binding var showPrincipal: Bool
+    //@EnvironmentObject var gameData: GameData
 
     enum SelectedView {
         case main
