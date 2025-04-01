@@ -27,12 +27,12 @@ struct ModesView: View {
             ZStack {
                 switch selectedView {
                 case .main:
-                    ScrollView(.horizontal, showsIndicators: false) {
+                    BounceDisabledScrollView(.horizontal) {
                         ZStack {
-                            Image("fondo")
+                            Image("fondoreal")
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: geometry.size.width * 3, height: geometry.size.height * 1.03)
+                                .frame(width: geometry.size.width * 3, height: geometry.size.height * 1.00)
 
                             HStack(spacing: 450) {
                                 ForEach(cards) { card in
@@ -64,6 +64,7 @@ struct ModesView: View {
                             .padding()
                         }
                     }
+
 
                 default:
                     EmptyView()
@@ -111,8 +112,8 @@ struct ModesView: View {
 
     var cards: [Card] {
         [
-            Card(title: "PUZZLE", imageName: "puzzle", colors: [.colorOne, .colorTwo], destination: .levelP),
-            Card(title: "GEOMETRY", imageName: "geometry", colors: [.colorOne, .colorFive], destination: .levelG),
+            Card(title: "El Bosque", imageName: "puzzle", colors: [.colorOne, .colorTwo], destination: .levelP),
+            Card(title: "La Selva", imageName: "geometry", colors: [.colorOne, .colorFive], destination: .levelG),
             Card(title: "NUMBERS", imageName: "numbers", colors: [.colorTree, .colorTwo], destination: .levelP)
         ]
     }

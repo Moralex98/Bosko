@@ -18,10 +18,16 @@ struct Balloon: Identifiable {
     var size: CGFloat
 }
 
-struct PickupItem: Identifiable {
-    var id = UUID()
+struct PickupItem: Identifiable, Equatable {
+    let id: UUID
     var imageName: String
     var position: CGPoint
+
+    init(id: UUID = UUID(), imageName: String, position: CGPoint) {
+        self.id = id
+        self.imageName = imageName
+        self.position = position
+    }
 }
 
 
