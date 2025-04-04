@@ -4,7 +4,6 @@
 //
 //  Created by Freddy Morales on 29/03/25.
 //
-
 import SwiftUI
 
 struct PuzzlePieceView: View {
@@ -12,22 +11,10 @@ struct PuzzlePieceView: View {
     var start: CGSize
     var targetPosition: CGPoint
     var size: CGFloat
+    @Binding var position: CGPoint
+    @Binding var isPlacedCorrectly: Bool
+    var gameEnded: Bool
     var onDrop: () -> Void
-
-    @State private var position: CGPoint
-    @State private var isPlacedCorrectly = false
-
-    init(imageName: String, start: CGSize, targetPosition: CGPoint, size: CGFloat, onDrop: @escaping () -> Void) {
-        self.imageName = imageName
-        self.start = start
-        self.targetPosition = targetPosition
-        self.size = size
-        self.onDrop = onDrop
-        _position = State(initialValue: CGPoint(
-            x: UIScreen.main.bounds.width / 2 + start.width,
-            y: UIScreen.main.bounds.height / 2 + start.height
-        ))
-    }
 
     var body: some View {
         Image(imageName)
@@ -39,47 +26,64 @@ struct PuzzlePieceView: View {
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        if !isPlacedCorrectly {
+                        if !isPlacedCorrectly && !gameEnded {
                             position = value.location
                         }
                     }
                     .onEnded { _ in
-                        if isInsideTarget(position, target: targetPosition, size: size) {
+                        guard !gameEnded else { return }
+                        if isNearTarget(position, target: targetPosition, size: size) {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 position = targetPosition
-                                if !isPlacedCorrectly {
-                                    isPlacedCorrectly = true
-                                    onDrop()
-                                }
+                                isPlacedCorrectly = true
+                                onDrop()
                             }
                         } else {
-                            // Regresa a su lugar si no está bien colocada
                             withAnimation(.easeInOut) {
-                                position = CGPoint(
-                                    x: UIScreen.main.bounds.width / 2 + start.width,
-                                    y: UIScreen.main.bounds.height / 2 + start.height
-                                )
+                                position = initialPosition()
                             }
                         }
                     }
             )
     }
 
-    private func isInsideTarget(_ current: CGPoint, target: CGPoint, size: CGFloat) -> Bool {
-        let half = size / 2
-        let frame = CGRect(x: target.x - half, y: target.y - half, width: size, height: size)
-        return frame.contains(current)
+    private func initialPosition() -> CGPoint {
+        CGPoint(
+            x: UIScreen.main.bounds.width / 2 + start.width,
+            y: UIScreen.main.bounds.height / 2 + start.height
+        )
+    }
+
+    private func isNearTarget(_ current: CGPoint, target: CGPoint, size: CGFloat) -> Bool {
+        let tolerance: CGFloat = size * 0.4
+        let dx = abs(current.x - target.x)
+        let dy = abs(current.y - target.y)
+        return dx <= tolerance && dy <= tolerance
     }
 }
 
+
 #Preview {
-    PuzzlePieceView(
-        imageName: "ab1",
-        start: CGSize(width: -170, height: 100),
-        targetPosition: CGPoint(x: 100, y: 100),
-        size: 133.33,
-        onDrop: {}
-    )
+    struct PreviewWrapper: View {
+        @State private var position = CGPoint(x: UIScreen.main.bounds.width / 2 - 170, y: UIScreen.main.bounds.height / 2 + 100)
+        @State private var placed = false
+
+        var body: some View {
+            PuzzlePieceView(
+                imageName: "ab1",
+                start: CGSize(width: -170, height: 100),
+                targetPosition: CGPoint(x: 100, y: 100),
+                size: 133.33,
+                position: $position,
+                isPlacedCorrectly: $placed,
+                gameEnded: false,
+                onDrop: {}
+            )
+        }
+    }
+
+    return PreviewWrapper()
 }
+
 
 

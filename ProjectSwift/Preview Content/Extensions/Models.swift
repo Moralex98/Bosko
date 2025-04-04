@@ -14,7 +14,7 @@ struct Balloon: Identifiable {
     var isPopped: Bool = false
     var speed: CGFloat
     var isBad: Bool
-    var rotation: Double 
+    var rotation: Double
     var size: CGFloat
 }
 
@@ -29,6 +29,18 @@ struct PickupItem: Identifiable, Equatable {
         self.position = position
     }
 }
+
+struct FishData: Identifiable {
+    let id = UUID()
+    let imageLeft: String
+    let imageRight: String
+    let startX: CGFloat
+    let yPosition: CGFloat
+    let step: CGFloat
+    let delay: Double
+    let size: CGFloat
+}
+
 
 
 

@@ -18,29 +18,28 @@ struct HeartShopView: View {
 
     var body: some View {
         ZStack {
-            // Fondo principal
             RoundedRectangle(cornerRadius: 25)
                 .fill(Color.cyan.opacity(0.2))
                 .frame(width: 300, height: 230)
                 .shadow(radius: 10)
 
-            // Contenido principal
             VStack(spacing: 20) {
                 Text("Comprar Vidas")
                     .font(.title2.bold())
                     .padding()
+                    .foregroundColor(Color.black)
 
                 HStack(spacing: 25) {
                     Button {
                         confirmPurchase(amount: 1)
                     } label: {
-                        heartOption(amount: 1, cost: 15)
+                        heartOption(amount: 1, cost: 10)
                     }
 
                     Button {
                         confirmPurchase(amount: 3)
                     } label: {
-                        heartOption(amount: 5, cost: 70)
+                        heartOption(amount: 5, cost: 40)
                     }
                 }
             }

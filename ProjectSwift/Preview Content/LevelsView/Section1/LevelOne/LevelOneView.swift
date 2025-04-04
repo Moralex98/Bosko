@@ -11,7 +11,7 @@ struct LevelOneView: View {
     var onFinish: (Int) -> Void
     var UISW: CGFloat { UIScreen.main.bounds.width }
     var UISH: CGFloat { UIScreen.main.bounds.height }
-
+    
     @State private var timeRemaining = 60
     @State private var showStartPopup = true
     @State private var showEndPopup = false
@@ -27,7 +27,7 @@ struct LevelOneView: View {
     @State private var rotateIcon = false
     @Binding var contentReturn: Bool
     @Binding var isPresented: Bool
-
+    
     var body: some View {
         ZStack {
             Group {
@@ -60,125 +60,166 @@ struct LevelOneView: View {
                     .position(x: UISW * 0.73, y: UISH * 0.75)
                 
                 //plastic
-                DraggableItemView(
-                    imageName: "bottle",
-                    start: CGSize(width: -UISW * 0.45, height: UISH * 0.35),
-                    targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                    size: UISW * 0.10,
-                    onDrop: { markItemDropped(at: 0) }
-                )
-                DraggableItemView(
-                    imageName: "bag",
-                    start: CGSize(width: UISW * 0.45, height: UISH * 0.35),
-                    targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                    size: UISW * 0.10,
-                    onDrop: { markItemDropped(at: 1) }
-                )
-                DraggableItemView(
-                    imageName: "glasslid",
-                    start: CGSize(width: -UISW * 0.36, height: -UISH * 0.2),
-                    targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                    size: UISW * 0.12,
-                    onDrop: { markItemDropped(at: 2) }
-                )
-                DraggableItemView(
-                    imageName: "glass1",
-                    start: CGSize(width: UISW * 0.44, height: -UISH * 0.23),
-                    targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
-                    size: UISW * 0.15,
-                    onDrop: { markItemDropped(at: 3) }
-                ) // glass
-                DraggableItemView(
-                    imageName: "wine",
-                    start: CGSize(width: -UISW * 0.30, height: UISH * 0.23),
-                    targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
-                    size: UISW * 0.10,
-                    onDrop: { markItemDropped(at: 4) }
-                )
-                DraggableItemView(
-                    imageName: "pitcher", start: CGSize(width: UISW * 0.40, height: UISH * 0.15),
-                    targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
-                    size: UISW * 0.10,
-                    onDrop: { markItemDropped(at: 5) }
-                )
-                DraggableItemView(
-                    imageName: "cup",
-                    start: CGSize(width: UISW * 0.15, height: UISH * 0.001),
-                    targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
-                    size: UISW * 0.15,
-                    onDrop: { markItemDropped(at: 6) }
-                ) //organic
-                DraggableItemView(
-                    imageName: "carrot",
-                    start: CGSize(width: -UISW * 0.13, height: UISH * 0.17),
-                    targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                    size: UISW * 0.10,
-                    onDrop: { markItemDropped(at: 7) }
-                )
-                DraggableItemView(
-                    imageName: "banana",
-                    start: CGSize(width: UISW * 0.10, height: UISH * 0.2),
-                    targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                    size: UISW * 0.10,
-                    onDrop: { markItemDropped(at: 8) }
-                )
-                DraggableItemView(
-                    imageName: "apple",
-                    start: CGSize(width: -UISW * 0.36, height: UISH * 0.027),
-                    targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                    size: UISW * 0.07,
-                    onDrop: { markItemDropped(at: 9) }
-                )
-                DraggableItemView(
-                    imageName: "fish",
-                    start: CGSize(width: -UISW * 0.01, height: -UISH * 0.3),
-                    targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
-                    size: UISW * 0.17,
-                    onDrop: { markItemDropped(at: 10) }
-                ) //paper
-                DraggableItemView(
+                if itemStates[0] {
+                    DraggableItemView(
+                        imageName: "bottle",
+                        start: CGSize(width: -UISW * 0.45, height: UISH * 0.35),
+                        targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
+                        size: UISW * 0.16,
+                        onDrop: { markItemDropped(at: 0) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[1] {
+                    DraggableItemView(
+                        imageName: "bag",
+                        start: CGSize(width: UISW * 0.45, height: UISH * 0.35),
+                        targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 1) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[2] {
+                    DraggableItemView(
+                        imageName: "glasslid",
+                        start: CGSize(width: -UISW * 0.36, height: -UISH * 0.2),
+                        targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 2) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[3] {
+                    DraggableItemView(
+                        imageName: "glass1",
+                        start: CGSize(width: UISW * 0.44, height: -UISH * 0.23),
+                        targetPosition: CGPoint(x: UISW * 0.85, y: UISH * 0.57),
+                        size: UISW * 0.20,
+                        onDrop: { markItemDropped(at: 3) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                // glass
+                if itemStates[4] {
+                    DraggableItemView(
+                        imageName: "wine",
+                        start: CGSize(width: -UISW * 0.30, height: UISH * 0.23),
+                        targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 4) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[5] {
+                    DraggableItemView(
+                        imageName: "pitcher", start: CGSize(width: UISW * 0.40, height: UISH * 0.15),
+                        targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 5) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[6] {
+                    DraggableItemView(
+                        imageName: "cup",
+                        start: CGSize(width: UISW * 0.12, height: UISH * 0.022),
+                        targetPosition: CGPoint(x: UISW * 0.15, y: UISH * 0.60),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 6) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[7] {//organic
+                    DraggableItemView(
+                        imageName: "carrot",
+                        start: CGSize(width: -UISW * 0.13, height: UISH * 0.17),
+                        targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 7) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[8] {
+                    DraggableItemView(
+                        imageName: "banana",
+                        start: CGSize(width: UISW * 0.10, height: UISH * 0.2),
+                        targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
+                        size: UISW * 0.15,
+                        onDrop: { markItemDropped(at: 8) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[9] {
+                    DraggableItemView(
+                        imageName: "apple",
+                        start: CGSize(width: -UISW * 0.36, height: UISH * 0.027),
+                        targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
+                        size: UISW * 0.10,
+                        onDrop: { markItemDropped(at: 9) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[10] {
+                    DraggableItemView(
+                        imageName: "fish",
+                        start: CGSize(width: -UISW * 0.01, height: -UISH * 0.3),
+                        targetPosition: CGPoint(x: UISW * 0.52, y: UISH * 0.90),
+                        size: UISW * 0.20,
+                        onDrop: { markItemDropped(at: 10) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                //paper
+                
+                if itemStates[11] {DraggableItemView(
                     imageName: "periodico",
                     start: CGSize(width: -UISW * 0.36, height: -UISH * 0.4),
                     targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                    size: UISW * 0.08,
+                    size: UISW * 0.12,
                     onDrop: { markItemDropped(at: 11) }
                 )
-                DraggableItemView(
-                    imageName: "carton",
-                    start: CGSize(width: UISW * 0.42, height: -UISH * 0.4),
-                    targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                    size: UISW * 0.18,
-                    onDrop: { markItemDropped(at: 12) }
-                )
-                DraggableItemView(
-                    imageName: "rollos",
-                    start: CGSize(width: UISW * 0.26, height: UISH * 0.4),
-                    targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
-                    size: UISW * 0.15,
-                    onDrop: { markItemDropped(at: 13) }
-                )
-                
+                .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[12] {
+                    DraggableItemView(
+                        imageName: "carton",
+                        start: CGSize(width: UISW * 0.42, height: -UISH * 0.4),
+                        targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
+                        size: UISW * 0.20,
+                        onDrop: { markItemDropped(at: 12) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
+                if itemStates[13] {
+                    DraggableItemView(
+                        imageName: "rollos",
+                        start: CGSize(width: UISW * 0.26, height: UISH * 0.4),
+                        targetPosition: CGPoint(x: UISW * 0.73, y: UISH * 0.75),
+                        size: UISW * 0.18,
+                        onDrop: { markItemDropped(at: 13) }
+                    )
+                    .shadow(color: Color.black.opacity(0.8), radius: 10, x: 0, y: 4)
+                }
                 HStack {
                     Button(action: {
                         pauseTime = true
                         timer?.invalidate()
                         showExitPopup = true
                     }) {
-                        Image(systemName: "arrowshape.turn.up.left")
-                            .font(.title2.bold())
-                            .frame(width: 30, height: 10)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
+                        Image("boton")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
                             .cornerRadius(15)
                     }
-
+                    
                     Spacer()
-
+                    
                     Text("Tiempo: \(timeRemaining)")
                         .font(.custom("Bebas Neue", size: 25))
                         .foregroundColor(.blue)
-
+                    
                     Spacer()
                     
                     Image(systemName: "gearshape.fill")
@@ -195,7 +236,7 @@ struct LevelOneView: View {
                 .padding()
                 .padding(.top, 05)
                 .background(Color.gray.opacity(0.4))
-                .position(x: UISW * 0.50, y: UISH * 0.02)
+                .position(x: UISW * 0.50, y: UISH * 0.01)
                 
                 if showConfiguration {
                     ConfigurationView(showConfig: $showConfiguration)
@@ -222,25 +263,22 @@ struct LevelOneView: View {
             }
             
             if showExitPopup {
-                Color.black.opacity(0.6)
-                    .ignoresSafeArea()
-
+                Color.black.opacity(0.6).ignoresSafeArea()
                 VStack(spacing: 16) {
                     Text("¿Deseas salir del juego?")
                         .font(.title2)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
-
                     Text("Si sales, no se contará ninguna estrella.")
                         .font(.subheadline)
                         .multilineTextAlignment(.center)
-
                     HStack(spacing: 20) {
                         Button("Salir") {
                             isPresented = false
+                            contentReturn = true
                         }
-                        .padding()
-                        .background(Color.red)
+                        .frame(width: 90, height: 20)
+                        .padding().background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(10)
 
@@ -249,8 +287,8 @@ struct LevelOneView: View {
                             startTimer()
                             showExitPopup = false
                         }
-                        .padding()
-                        .background(Color.green)
+                        .frame(width: 90, height: 20)
+                        .padding().background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                     }
@@ -270,7 +308,7 @@ struct LevelOneView: View {
         }
         .alert("¿Deseas salir del juego?", isPresented: $showExitConfirmation) {
             Button("Sí, regresar", role: .destructive) {
-                isPresented = false 
+                isPresented = false
             }
             Button("Continuar", role: .cancel) {
                 pauseTime = false
@@ -280,59 +318,68 @@ struct LevelOneView: View {
             Text("Si sales, no se contará ninguna estrella.")
         }
     }
-        
     
     private func endGamePopup() -> some View {
-           VStack(spacing: 16) {
-               Text("¡Nivel completado!")
-                   .font(.title)
-                   .fontWeight(.bold)
+        VStack(spacing: 16) {
+            Text("¡Nivel completado!")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
 
-               HStack(spacing: 8) {
-                   ForEach(0..<3) { index in
-                       Image(systemName: index < estrellasObtenidas ? "star.fill" : "star")
-                           .resizable()
-                           .frame(width: 40, height: 40)
-                           .foregroundColor(.yellow)
-                   }
-               }
+            HStack(spacing: 8) {
+                ForEach(0..<3) { index in
+                    ZStack {
+                        Image(systemName: "star")
+                            .resizable()
+                            .frame(width: 42, height: 42)
+                            .foregroundColor(.black)
+                        
+                        Image(systemName: index < estrellasObtenidas ? "star.fill" : "star")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .foregroundColor(index  < estrellasObtenidas ? .yellow : .black.opacity(0.5))
+                    }
+                }
+            }
 
-               Text("Tiempo: \(60 - timeRemaining) segundos")
-                   .font(.subheadline)
+                Text("Tu tiempo fue de: \(60 - timeRemaining) segundos")
+                    .font(.subheadline)
+                    .foregroundColor(.black)
 
-               HStack(spacing: 20) {
-                   Button("Reintentar") {
-                       resetGame()
-                   }
-                   .padding()
-                   .background(Color.blue)
-                   .foregroundColor(.white)
-                   .cornerRadius(10)
+                HStack(spacing: 20) {
+                    Button("Reintentar") {
+                        resetGame()
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
 
-                   Button("Salir") {
-                       onFinish(estrellasObtenidas)
-                       isPresented = false
-                   }
-                   .padding()
-                   .background(Color.green)
-                   .foregroundColor(.white)
-                   .cornerRadius(10)
-               }
-           }
-           .padding()
-           .background(Color.white)
-           .cornerRadius(20)
-           .shadow(radius: 10)
-           .frame(maxWidth: 300)
-       }
+                Button("Salir") {
+                    onFinish(estrellasObtenidas)
+                    isPresented = false
+                }
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 10)
+        .frame(maxWidth: 300)
+    }
 
-       private func resetGame() {
-           timeRemaining = 60
-           itemStates = Array(repeating: true, count: 14)
-           itemsRemaining = 14
-           showEndPopup = false
-           startTimer()
-       }
+    private func resetGame() {
+        timeRemaining = 60
+        estrellasObtenidas = 0
+        itemStates = Array(repeating: true, count: 14)
+        itemsRemaining = 14
+        showEndPopup = false
+        startTimer()
+    }
         
     private func itemDropped() {
         itemsRemaining -= 1

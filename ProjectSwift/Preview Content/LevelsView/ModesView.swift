@@ -17,7 +17,7 @@ struct ModesView: View {
         case main
         case levelP
         case levelG
-        case menu
+        case levelA
     }
 
     @State private var selectedView: SelectedView = .main
@@ -42,7 +42,7 @@ struct ModesView: View {
                                         }) {
                                             ZStack {
                                                 Circle()
-                                                    .fill(.ultraThinMaterial) // Fondo tipo vidrio esmerilado
+                                                    .fill(.ultraThinMaterial)
                                                     .frame(width: 400, height: 300)
                                                     .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
                                                     .overlay(
@@ -53,14 +53,15 @@ struct ModesView: View {
                                                 Image(card.imageName)
                                                     .resizable()
                                                     .scaledToFit()
-                                                    .frame(width: 300, height: 300) // Ajustado para encajar mejor en el círculo
+                                                    .frame(width: 300, height: 300)
                                             }
                                         }
 
                                         Text(card.title)
                                             .font(.largeTitle.bold())
                                             .foregroundStyle(.white)
-                                            .shadow(color: .black.opacity(0.7), radius: 4, x: 2, y: 2)
+                                            .shadow(color:
+                                                .black.opacity(0.7), radius: 4, x: 2, y: 2)
                                             .padding(.top, 10)
 
                                     }
@@ -90,7 +91,7 @@ struct ModesView: View {
                     )
 
                 case .levelG:
-                    ContentView(
+                    ContentView2(
                         score: 0,
                         isPressented: Binding(
                             get: { selectedView != .main },
@@ -98,8 +99,8 @@ struct ModesView: View {
                         )
                     )
 
-                case .menu:
-                    ContentView(
+                case .levelA:
+                    ContentView3(
                         score: 0,
                         isPressented: Binding(
                             get: { selectedView != .main },
@@ -119,7 +120,7 @@ struct ModesView: View {
         [
             Card(title: "El bosque de Pachito", imageName: "tlacua", colors: [.colorOne, .colorTwo], destination: .levelP),
             Card(title: "La selva de Balam", imageName: "jaguarsentao", colors: [.colorOne, .colorFive], destination: .levelG),
-            Card(title: "El mar de Chelonio", imageName: "tortugagolfina", colors: [.colorTree, .colorTwo], destination: .levelP)
+            Card(title: "El mar de Chelonio", imageName: "tortugagolfina", colors: [.colorTree, .colorTwo], destination: .levelA)
         ]
     }
 

@@ -23,11 +23,12 @@ struct ScoreView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.cyan.opacity(0.4))
+                .fill(Color.white)
                 .frame(width: 280, height: 50)
+                .shadow(color: Color.black.opacity(0.5), radius: 2)
             
             HStack(spacing: 20) {
-                Text("Puntuación:  \(Text("\(gameData.score)").foregroundColor(.orange))")
+                Text("Puntuación:  \(Text("\(gameData.score)").foregroundColor(.black))")
                     .font(.custom("Bebas Neue", size: 25))
                     .foregroundColor(.red)
                 
@@ -139,7 +140,6 @@ struct ConfigurationView: View {
                 .frame(width: 150, height: 50)
             
             HStack(spacing: 25) {
-                // Botón para el sonido de fondo
                 Image(systemName: isPressedVoice ? "speaker.slash.fill" : "speaker.wave.2.fill")
                     .foregroundColor(.black)
                     .font(.title)
@@ -159,7 +159,6 @@ struct ConfigurationView: View {
                         }
                     }
                 
-                // Botón para efectos de sonido (clicks, drops)
                 Image(systemName: isPressedSound ? "waveform.slash" : "waveform")
                     .foregroundColor(.black)
                     .font(.title)

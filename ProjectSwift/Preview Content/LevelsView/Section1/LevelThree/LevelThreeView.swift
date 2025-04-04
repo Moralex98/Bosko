@@ -145,7 +145,7 @@ struct LevelThreeView: View {
         let imageName = getNextImage(isBad: isBad)
         let randomSpeed = Double.random(in: 1...3) / speedMultiplier
         let randomRotation = Double.random(in: -360...360)
-        let randomSize = CGFloat.random(in: 100...300)
+        let randomSize = CGFloat.random(in: 200...500)
 
         let initialPosition = CGPoint(x: randomXPosition, y: screenHeight + 50)
 
@@ -217,45 +217,6 @@ struct LevelThreeView: View {
         startSpawningBalloons()
     }
 
-    private func endGamePopup() -> some View {
-        VStack(spacing: 16) {
-            Text("¡Nivel completado!")
-                .font(.title).fontWeight(.bold)
-
-            HStack(spacing: 8) {
-                ForEach(0..<3) { index in
-                    Image(systemName: index < estrellasObtenidas ? "star.fill" : "star")
-                        .resizable().frame(width: 40, height: 40)
-                        .foregroundColor(.yellow)
-                }
-            }
-
-            Text("Tu puntuación es de : \(goodBalloonsPopped)")
-                .font(.subheadline)
-
-            HStack(spacing: 20) {
-                Button("Reintentar") {
-                    resetGame()
-                }
-                .padding().background(Color.blue)
-                .foregroundColor(.white).cornerRadius(10)
-
-                Button("Salir") {
-                    onFinish(estrellasObtenidas)
-                    isPresented = false
-                    contentReturn = true
-                }
-                .padding().background(Color.green)
-                .foregroundColor(.white).cornerRadius(10)
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .frame(maxWidth: 300)
-    }
-
     private func startPopup() -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 30)
@@ -297,6 +258,50 @@ struct LevelThreeView: View {
         }
         .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.45)
         .ignoresSafeArea()
+    }
+    private func endGamePopup() -> some View {
+        VStack(spacing: 16) {
+            Text("¡Nivel completado!")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
+
+                HStack(spacing: 8) {
+                    ForEach(0..<3) { index in
+                        ZStack {
+                            Image(systemName: "star")
+                                .resizable()
+                                .frame(width: 42, height: 42)
+                                .foregroundColor(.black)
+                            
+                            Image(systemName: index < estrellasObtenidas ? "star.fill" : "star")
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .foregroundColor(index  < estrellasObtenidas ? .yellow : .black.opacity(0.5))
+                        }
+                }
+            }
+            HStack(spacing: 20) {
+                Button("Reintentar") {
+                    resetGame()
+                }
+                .padding().background(Color.blue)
+                .foregroundColor(.white).cornerRadius(10)
+
+                Button("Salir") {
+                    onFinish(estrellasObtenidas)
+                    isPresented = false
+                    contentReturn = true
+                }
+                .padding().background(Color.green)
+                .foregroundColor(.white).cornerRadius(10)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 10)
+        .frame(maxWidth: 300)
     }
 }
 

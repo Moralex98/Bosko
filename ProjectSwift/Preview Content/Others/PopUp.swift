@@ -20,17 +20,20 @@ struct PopUpView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 30)
                     .foregroundColor(.white)
+                    .shadow(radius: 10)
+                    .frame(width: 700, height: 500)
+                
+                Image("jaguaricon")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 250, height: 250)
+                    .offset(y: -150)
                 
                 VStack{
-                    Image(systemName: "checkmark.seal.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 130)
-                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                    
                     Text("¿Listo para comenzar?")
-                        .font(.largeTitle.bold())
+                        .font(.custom("Bebas Neue", size: 45))
                         .padding(.top, 50)
+                        .foregroundColor(Color.black)
                     
                     Text(instructions)
                         .multilineTextAlignment(.center)
@@ -49,10 +52,11 @@ struct PopUpView: View {
                             .foregroundStyle(.white)
                             .padding()
                     }
-                    .background(.blue)
-                    .cornerRadius(15)
-                    .padding(.top, 30)
+                    .background(Color.negroTransparente)
+                    .cornerRadius(25)
+                    //.padding(.top, 30)
                 }
+                .offset(y: 10)
             }
             .frame(width: UISW * 0.8, height: UISH * 0.4)
         }.ignoresSafeArea()

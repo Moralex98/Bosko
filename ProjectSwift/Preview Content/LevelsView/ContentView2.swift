@@ -31,30 +31,29 @@ struct ContentView2: View {
 
     var body: some View {
         ZStack {
-            Image("fondonivels")
+            Image("fondoselva")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
             
             VStack {
                 ZStack{
-                    Text("El bosque de Pachito")
+                    Text("La selva de Balam")
                         .font(.title3)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.6))
                         .offset(y: -430)
+                        .foregroundColor(.black)
                     
                     Button(action: {
                         isPressented = false
                     }) {
-                        Image(systemName: "arrowshape.turn.up.left")
-                            .font(.title2.bold())
-                            .frame(width: 30, height: 10)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
+                        Image("boton")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
                             .cornerRadius(15)
                     }
                     .position(x: UISW * 0.06, y: UISH * 0.02)
@@ -92,12 +91,18 @@ struct ContentView2: View {
                         
                         HStack(spacing: 9) {
                             ForEach(0..<3) { starIndex in
-                                Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                    .foregroundColor(starIndex < levelStars[index] ? .red : .black)
-                                    .offset(y: floating ? -5 : 5)
-                                    .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
+                                ZStack {
+                                    Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
+                                        .resizable()
+                                        .frame(width: 22, height: 22)
+                                        .foregroundColor(.black)
+                                    Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(starIndex < levelStars[index] ? .yellow : .black)
+                                }
+                                .offset(y: floating ? -5 : 5)
+                                .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
                             }
                         }
                     }
@@ -155,11 +160,11 @@ struct ContentView2: View {
             
         }
         .onAppear {
-            playBackgroundSound(sound: .IntroCumbia, fadeOutPrevious: true)
+            playBackgroundSound(sound: .selva, fadeOutPrevious: true)
             floating.toggle()
         }
         .fullScreenCover(isPresented: $showLevelOne) {
-            LevelOneView(
+            LevelOneTwoView(
                 onFinish: { estrellas in
                     levelStars[0] = estrellas
                 },

@@ -29,6 +29,14 @@ struct ContentView: View {
     @State private var showNoLivesPopup = false
     @State private var showHeartShop = false
     @State private var contentReturn = true
+    
+    @State private var showFirstDialog = false
+    @State private var showSecondDialog = false
+    
+    @State private var firstDialogOffset: CGPoint = CGPoint(x: UIScreen.main.bounds.width, y: -90)
+        @State private var secondDialogOffset: CGPoint = CGPoint(x: -UIScreen.main.bounds.width, y: 270)
+
+
     @Binding var isPressented: Bool
 
     var body: some View {
@@ -38,29 +46,77 @@ struct ContentView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
             
+            if showFirstDialog {
+                ZStack {
+                    Image(systemName: "bubble.right.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 225, height: 225)
+                        .foregroundColor(Color.gray.opacity(0.8))
+                    VStack{
+                        Text("¡Ayuda a Tlacua para ")
+                        Text("que aprenda a tirar")
+                        Text("la basura!")
+                    }
+                    .foregroundColor(.black)
+                    .font(.title2)
+                        }
+                        .offset(x: firstDialogOffset.x, y: firstDialogOffset.y)
+                        .onAppear {
+                            withAnimation(.easeOut(duration: 1.0)) {
+
+                    firstDialogOffset = CGPoint(x: 180, y: -90)
+                    }
+                }
+            }
+
+            if showSecondDialog {
+                ZStack {
+                    Image(systemName: "bubble.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .foregroundColor(Color.gray.opacity(0.8))
+                        
+
+                    VStack{
+                        Text("¿Pero? !Si todos tiran")
+                        Text("la basura")
+                        Text("donde quieren¡")
+                    }
+                    .foregroundColor(.black)
+                    .font(.title2)
+                    }
+                    .offset(x: secondDialogOffset.x, y: secondDialogOffset.y)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 1.0)) {
+                                    secondDialogOffset = CGPoint(x: -200, y: 270)
+                    }
+                }
+            }
+
             VStack {
                 ZStack{
-                    Text("La selva de Balam")
+                    Text("El bosque de Pachito")
                         .font(.title3)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.6))
-                        .offset(y: -220)
+                        .offset(y: -210)
                     
                     Button(action: {
                         isPressented = false
                     }) {
-                        Image(systemName: "arrowshape.turn.up.left")
-                            .font(.title2.bold())
-                            .frame(width: 30, height: 10)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
+                        Image("boton")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
                             .cornerRadius(15)
                     }
                     .position(x: UISW * 0.06, y: UISH * 0.02)
                 }
+                
                 ForEach(0..<min(xOffsets.count, icons.count), id: \.self) { index in
                     VStack {
                         Button {
@@ -106,12 +162,19 @@ struct ContentView: View {
                         
                         HStack(spacing: 9) {
                             ForEach(0..<3) { starIndex in
-                                Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
-                                    .resizable()
-                                    .frame(width: 20, height: 20)
-                                    .foregroundColor(starIndex < levelStars[index] ? .red : .black)
-                                    .offset(y: floating ? -5 : 5)
-                                    .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
+                                ZStack {
+                                    Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
+                                        .resizable()
+                                        .frame(width: 22, height: 22)
+                                        .foregroundColor(.black)
+                                            
+                                    Image(systemName: starIndex < levelStars[index] ? "star.fill" : "star")
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(starIndex < levelStars[index] ? .yellow : .black)
+                                }
+                                .offset(y: floating ? -5 : 5)
+                                .animation(.easeInOut(duration: 1.5).repeatForever(), value: floating)
                             }
                         }
                     }
@@ -170,6 +233,13 @@ struct ContentView: View {
         .onAppear {
             playBackgroundSound(sound: .IntroCumbia, fadeOutPrevious: true)
             floating.toggle()
+            
+
+            showFirstDialog = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                showSecondDialog = true
+            }
         }
         .fullScreenCover(isPresented: $showLevelOne) {
             LevelOneView(

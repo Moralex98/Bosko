@@ -17,7 +17,19 @@ struct LevelTwoView: View {
     var UISH: CGFloat { UIScreen.main.bounds.height }
 
     @State private var piezasColocadas = 0
-    @State private var piezasMezcladas: [String] = (1...9).map { "ab\($0)" }.shuffled()
+    //@State private var piezasMezcladas: [String] = (1...9).map { "ab\($0)" }.shuffled()
+    @State private var piezasMezcladas = ["ab1", "ab2", "ab3", "ab4", "ab5", "ab6", "ab7", "ab8", "ab9"].shuffled()
+
+//    let posicionesGrid: [CGSize] = [
+//        CGSize(width: -170, height: -170), CGSize(width: 0, height: -170), CGSize(width: 170, height: -170),
+//        CGSize(width: -170, height: 0),    CGSize(width: 0, height: 0),     CGSize(width: 170, height: 0),
+//        CGSize(width: -170, height: 170),  CGSize(width: 0, height: 170),   CGSize(width: 170, height: 170)
+//    ]
+
+    @State private var posiciones: [CGPoint] = Array(repeating: .zero, count: 9)
+    @State private var colocadas: [Bool] = Array(repeating: false, count: 9)
+    @State private var juegoTerminado = false
+
     @State private var timeRemaining = 45
     @State private var showStartPopup = true
     @State private var showEndPopup = false
@@ -29,6 +41,12 @@ struct LevelTwoView: View {
     @State private var showConfiguration = false
     @State private var rotateIcon = false
     @State private var itemStates = Array(repeating: true, count: 9)
+    
+    @State private var posAb1 = CGPoint(x: UIScreen.main.bounds.width / 2 - 170, y: UIScreen.main.bounds.height / 2 + 100)
+    @State private var placedAb1 = false
+    @State private var gameFinished = false
+
+
 
     private let sizeP: CGFloat = 330
     let gridSize: CGFloat = 400
@@ -60,9 +78,22 @@ struct LevelTwoView: View {
                 .frame(width: 490, height: 490)
                 .position(x: UIScreen.main.bounds.width * 0.48, y: 300)
 
+//            ForEach(0..<9, id: \.self) { index in
+//                let imageName = piezasMezcladas[index]
+//                let piezaNum = Int(imageName.dropFirst(2))!
+//                let row = (piezaNum - 1) / 3
+//                let col = (piezaNum - 1) % 3
+//
+//                PuzzlePieceView(
+//                    imageName: imageName,
+//                    start: posicionesGrid[index],
+//                    targetPosition: targetPosition(row: row, col: col),
+//                    size: sizeP,
+//                    onDrop: { markItemDropped(at: index) }
+//                )
             ForEach(0..<9, id: \.self) { index in
                 let imageName = piezasMezcladas[index]
-                let piezaNum = Int(imageName.dropFirst(2))!
+                let piezaNum = Int(imageName.dropFirst(2))! // "ab1" → 1
                 let row = (piezaNum - 1) / 3
                 let col = (piezaNum - 1) % 3
 
@@ -71,8 +102,14 @@ struct LevelTwoView: View {
                     start: posicionesGrid[index],
                     targetPosition: targetPosition(row: row, col: col),
                     size: sizeP,
-                    onDrop: { markItemDropped(at: index) }
+                    position: $posiciones[index],
+                    isPlacedCorrectly: $colocadas[index],
+                    gameEnded: juegoTerminado,
+                    onDrop: {
+                        checkPuzzleCompletado()
+                    }
                 )
+                
             }
 
             VStack {
@@ -88,12 +125,10 @@ struct LevelTwoView: View {
                     timer?.invalidate()
                     showExitPopup = true
                 }) {
-                    Image(systemName: "arrowshape.turn.up.left")
-                        .font(.title2.bold())
-                        .frame(width: 30, height: 10)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.blue)
+                    Image("boton")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
                         .cornerRadius(15)
                 }
 
@@ -126,15 +161,6 @@ struct LevelTwoView: View {
                     .offset(x: 250, y: -535)
             }
 
-            if showStartPopup {
-                Color.black.opacity(0.7).ignoresSafeArea()
-                PopUpView(
-                    popup: $showStartPopup,
-                    save: $save,
-                    instructions: "!Ayuda a restaurar la limpieza de la ciudad colocando las piezas en su lugar¡"
-                )
-                .zIndex(1)
-            }
 
             if showExitPopup {
                 Color.black.opacity(0.6).ignoresSafeArea()
@@ -151,6 +177,7 @@ struct LevelTwoView: View {
                             isPresented = false
                             contentReturn = true
                         }
+                        .frame(width: 90, height: 20)
                         .padding().background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(10)
@@ -160,6 +187,7 @@ struct LevelTwoView: View {
                             startTimer()
                             showExitPopup = false
                         }
+                        .frame(width: 90, height: 20)
                         .padding().background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(10)
@@ -176,8 +204,40 @@ struct LevelTwoView: View {
             if showEndPopup {
                 endGamePopup()
             }
+            
+            if showStartPopup {
+                Color.black.opacity(0.7).ignoresSafeArea()
+                PopUpView(
+                    popup: $showStartPopup,
+                    save: $save,
+                    instructions: "!Ayuda a restaurar la limpieza de la ciudad colocando las piezas en su lugar¡"
+                )
+                .zIndex(1)
+            }
+
         }
-        .onChange(of: save) { if save { startTimer() } }
+        .onAppear {
+            for i in 0..<9 {
+                posiciones[i] = CGPoint(
+                    x: UIScreen.main.bounds.width / 2 + posicionesGrid[i].width,
+                    y: UIScreen.main.bounds.height / 2 + posicionesGrid[i].height
+                )
+            }
+        }
+
+        .onChange(of: save) { newValue in
+            if newValue {
+                for i in 0..<9 {
+                    posiciones[i] = CGPoint(
+                        x: UIScreen.main.bounds.width / 2 + posicionesGrid[i].width,
+                        y: UIScreen.main.bounds.height / 2 + posicionesGrid[i].height
+                    )
+                }
+                colocadas = Array(repeating: false, count: 9)
+                juegoTerminado = false
+                startTimer()
+            }
+        }
     }
 
     func targetPosition(row: Int, col: Int) -> CGPoint {
@@ -226,6 +286,10 @@ struct LevelTwoView: View {
         itemStates = Array(repeating: true, count: 9)
         showEndPopup = false
         startTimer()
+        
+        posAb1 = CGPoint(x: UIScreen.main.bounds.width / 2 - 170, y: UIScreen.main.bounds.height / 2 + 100)
+        placedAb1 = false
+
     }
 
     private func calcularEstrellasYActualizarPuntuacion() {
@@ -250,23 +314,68 @@ struct LevelTwoView: View {
             gameData.lives -= 1
         }
     }
+    
+//    func targetPosition(row: Int, col: Int) -> CGPoint {
+//        let startX = UIScreen.main.bounds.width / 2 - 133.33
+//        let startY = UIScreen.main.bounds.height / 2 - 133.33
+//        return CGPoint(
+//            x: startX + CGFloat(col) * 133.33,
+//            y: startY + CGFloat(row) * 133.33
+//        )
+//    }
 
+    func checkPuzzleCompletado() {
+        if colocadas.allSatisfy({ $0 }) {
+            juegoTerminado = true
+            timer?.invalidate()
+            calcularEstrellasYActualizarPuntuacion()
+            showEndPopup = true
+        }
+    }
+
+    func resetPuzzle() {
+        timeRemaining = 45
+        piezasColocadas = 0
+        piezasMezcladas.shuffle()
+        for i in 0..<9 {
+            posiciones[i] = CGPoint(
+                x: UIScreen.main.bounds.width / 2 + posicionesGrid[i].width,
+                y: UIScreen.main.bounds.height / 2 + posicionesGrid[i].height
+            )
+            colocadas[i] = false
+        }
+        juegoTerminado = false
+        itemStates = Array(repeating: true, count: 9)
+        showEndPopup = false
+        startTimer()
+    }
     private func endGamePopup() -> some View {
         VStack(spacing: 16) {
             Text("¡Nivel completado!")
-                .font(.title).fontWeight(.bold)
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
             HStack(spacing: 8) {
                 ForEach(0..<3) { index in
-                    Image(systemName: index < estrellasObtenidas ? "star.fill" : "star")
-                        .resizable().frame(width: 40, height: 40)
-                        .foregroundColor(.yellow)
+                    ZStack {
+                        Image(systemName: "star")
+                            .resizable()
+                            .frame(width: 42, height: 42)
+                            .foregroundColor(.black)
+                        
+                        Image(systemName: index < estrellasObtenidas ? "star.fill" : "star")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .foregroundColor(index  < estrellasObtenidas ? .yellow : .black.opacity(0.5))
+                    }
                 }
             }
-            Text("Tiempo: \(45 - timeRemaining) segundos")
-                .font(.subheadline)
+            Text("Tu tiempo fue de: \(45 - timeRemaining) segundos")
+                    .font(.subheadline)
+                    .foregroundColor(.black)
             HStack(spacing: 20) {
                 Button("Reintentar") {
-                    resetGame()
+                        resetGame()
                 }
                 .padding().background(Color.blue)
                 .foregroundColor(.white).cornerRadius(10)
@@ -287,6 +396,8 @@ struct LevelTwoView: View {
         .frame(maxWidth: 300)
     }
 }
+
+
 
 #Preview {
     LevelTwoView(

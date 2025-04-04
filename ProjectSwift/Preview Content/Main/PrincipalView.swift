@@ -82,7 +82,7 @@ struct PrincipalView: View {
                             .frame(width: 150, height: 30)
                             .foregroundColor(.white)
                             .padding()
-                            .background(Color.blue)
+                            .background(Color.negroTransparente)
                             .cornerRadius(15)
                     }
 
@@ -102,7 +102,7 @@ struct PrincipalView: View {
             }
         }
         .onAppear {
-             //playBackgroundSound(sound: .Introduc, fadeOutPrevious: false)
+             playBackgroundSound(sound: .Introduc, fadeOutPrevious: false)
             floatCharacters = true
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

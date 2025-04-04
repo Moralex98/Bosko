@@ -15,6 +15,10 @@ enum SoundOption: String{
     case Basura
     case IntroCumbia
     case Introduc
+    case mar
+    case selva
+    case coin
+    case power
 }
 
 func playBackgroundSound(sound: SoundOption, fadeOutPrevious: Bool = true) {
